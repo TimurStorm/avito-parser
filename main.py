@@ -1,19 +1,32 @@
 import eel
-from view import find_new_ads
-from settings import *
+from app.view import find_new_ads
+from app.settings import *
 
 eel.init("templates")
 
-eel.start("main.html", block=False, size=WIND_SIZE)
 
-# вставить сюда все то , что нужно вывести
-while True:
-    resp = find_new_ads()
-    print(resp)
-    if isinstance(resp, list):
-        eel.addText(resp[0])
-        if len(resp) == 2:
-            eel.addText(resp[1])
-    else:
+# вторичный поток
+"""
+def my_other_thread():
+    while True:
+        print("I'm a thread")
+        eel.sleep(1.0)
+
+
+eel.spawn(my_other_thread)"""
+
+
+@eel.expose
+def tim():
+    while True:
+        resp = find_new_ads()
         eel.addText(resp)
-    eel.sleep(ITER_TIME * 60.0)
+        eel.sleep(60.0)
+
+eel.start("main.html", size=WIND_SIZE)
+
+# вставить сюда все то , что нужно вывести, главный поток
+"""while True:
+    eel.addText(find_new_ads())
+    eel.sleep(30.0)
+"""
