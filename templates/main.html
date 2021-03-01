@@ -42,10 +42,9 @@
             var div = document.getElementById("information");
             div.innerHTML += "<br>" + text;
         }
-        function print(){
-            addText("js работает");
-            let ti = eel.tim();
-            addText(ti);
+        eel.expose(test);
+        function test(){
+            eel.find_new_ads();
         }
     </script>
 </head>
@@ -63,7 +62,7 @@
                     <a>Кнопка 2</a>
                 </div>
                 <div class="butt">
-                    <a>Кнопка 3</a>
+                    <button onclick="test()">Начать</button>
                 </div>
                 <div class="butt">
                     <button onclick="print()">Начать</button>

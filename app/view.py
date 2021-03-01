@@ -38,6 +38,7 @@ def get_all_ads():
     return ad, resp
 
 
+@eel.expose
 # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
 def find_new_ads():
     ads_title = []
@@ -71,4 +72,4 @@ def find_new_ads():
                 )
                 writer.writerow({"Title": title, "Link": link})
             sleep(2)
-    return resp
+    eel.addText(resp)
