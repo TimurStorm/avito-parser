@@ -38,13 +38,20 @@
     <script src="/eel.js"></script>
     <script>
         eel.expose(addText);
+        var act = new Boolean(false);
         function addText(text){
             var div = document.getElementById("information");
             div.innerHTML += "<br>" + text;
         }
-        eel.expose(test);
         function test(){
-            eel.find_new_ads();
+            if (act == false){
+                eel.set_thread(0);
+                act = true;
+            }
+            else{
+                eel.set_id(0);
+                act = false;
+            }
         }
     </script>
 </head>
@@ -62,10 +69,7 @@
                     <a>Кнопка 2</a>
                 </div>
                 <div class="butt">
-                    <button onclick="test()">Начать</button>
-                </div>
-                <div class="butt">
-                    <button onclick="print()">Начать</button>
+                    <button onclick="test()">Тест</button>
                 </div>
             </div>
         </dir>

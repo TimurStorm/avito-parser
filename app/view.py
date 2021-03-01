@@ -23,14 +23,14 @@ def send_message(text):
 
 
 # находит объявления на сайте
-def get_all_ads():
-    page = requests.get("https://www.avito.ru/rossiya/knigi_i_zhurnaly?q=ёсикава")
+def get_all_ads(url):
+    page = requests.get(url)
     code_dict = str(page)
     code = ""
     for i in code_dict:
         if i.isdigit():
             code += i
-    resp = datetime.now().strftime("%d %B, %H:%M") + ": " + "Код ответа " + code
+    resp = datetime.now().strftime("%d %B, %H:%M") + ": " + "Response code " + code
     soup = BeautifulSoup(page.content, "lxml")
     # print(soup.prettify())
     cont = soup.find("div", attrs={"data-marker": "catalog-serp"})
@@ -38,15 +38,13 @@ def get_all_ads():
     return ad, resp
 
 
-@eel.expose
 # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
-def find_new_ads():
-    ads_title = []
+def find_new_ads(url, ads_title):
     with open(DIR_PATH + "/csv/ads.csv", encoding="utf-8") as file:
         reader = csv.reader(file, delimiter=",")
         for row in reader:
             ads_title.append(row[0])
-    new_ad, resp = get_all_ads()
+    new_ad, resp = get_all_ads(url=url)
     for ad in new_ad:
         # ищем информацию о каждом объявлении
         info = ad.find("div", attrs={"class": "iva-item-body-NPl6W"})
@@ -60,7 +58,7 @@ def find_new_ads():
             link = "https://www.avito.ru" + title_link.get("href")
             send_message(text="New Book!" + "\n" + title + "\n" + link)
             ads_title.append(title)
-            #resp.append("New Book!" + "\n" + title + "\n" + link)
+            eel.addText("New Book!" + "\n" + title + "\n" + link)
 
             # записываем в файл новое объявление
             with open(DIR_PATH + "/csv/ads.csv", mode="a", encoding="utf-8") as file:
