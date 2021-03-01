@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="Main.js"></script>
     <title>Title</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap">
+    <link rel="stylesheet" href="Main.css">
     <style>
         html,body{
             margin:0;
@@ -31,15 +33,32 @@
         .butt{
             padding: 5px;
         }
+        A {
+    text-decoration: none;
+   } 
     </style>
+
+    <input type="checkbox" id="hmt" class="hidden-menu-ticker">
+    <label class="btn-menu" for="hmt">
+        <span class="first"></span>
+        <span class="second"></span>
+        <span class="third"></span>
+    </label>
+
+    <ul class = "hidden-menu"> 
+        <p>   Menu  </p>       
+        <li> <a  href="">Поиск книги</a> </li>
+        <li> <a href="">Link 2</a> </li>
+        <li> <a href="">Link 3</a> </li>
+    </ul>
 
 
 </head>
 <body>
-    <div id="info">
+    <!-- <div id="info">
         <dir id="menu">
             <div id="menu_title">
-                <a>Menu:</a>
+                <a>Menu</a>
             </div>
             <div id="menu_buttons">
                 <div class="butt">
@@ -58,5 +77,5 @@
         </dir>
         <dir id="information">
         </dir>
-    </div>
+    </div> -->
 </body>
