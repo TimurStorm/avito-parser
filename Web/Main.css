@@ -17,26 +17,41 @@
     -webkit-backface-visibility: hidden;
 }
 
-.hidden-menu-ticker
+ .hidden-menu-ticker
 {
     display: none;
-}
+    background-color: #666;
+} 
 
 .btn-menu
 {
     color: #fff;
     background-color: #666;
     padding: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 5px;
+    padding-right: 7px;
     position:fixed;
-    top: 1px;
+    top: 0px;
     left: 0px;
     cursor: pointer;
     transition: left .23s;
     z-index: 3;
-    width: 25px;
+    width: 28px;
+    height: 28px;
     -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+}
+
+.child
+{
+  background-color: #666;
+    padding: 5px;
+    padding-left: 5px;
+    padding-right: 7px;
+    position:fixed;
+    width: 28px;
+    height: 100%;
+    left: 0px;
     -webkit-backface-visibility: hidden;
 }
 .btn-menu span
@@ -52,10 +67,13 @@
 .btn-menu span.first
 {
 margin-top: 0;
-left:5 px;
+left:0px;
 right:5 px;
 }
 
+:checked ~ .child{
+  left: 160px;
+}
 .hidden-menu-ticker:checked ~ .btn-menu
 {
   left: 160px;
