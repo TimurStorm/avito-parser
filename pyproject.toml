@@ -12,6 +12,7 @@ requests = "^2.25.1"
 bs4 = "^0.0.1"
 lxml = "^4.6.2"
 black = "^20.8b1"
+Jinja2 = "^2.11.3"
 
 [tool.poetry.dev-dependencies]
 
