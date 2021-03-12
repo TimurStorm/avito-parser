@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="Main.js"></script>
+    <script type="text/javascript" src="/eel.js"></script>
+    <title>Title</title>
+    <script>
+        var act = eel.get_parser(0);
+        eel.expose(print);
+        function print(x){
+            var elem = document.getElementById("information");
+            var resp = "\n<br>" + x;
+            elem.innerHTML += resp;
+        }
+        function start(){
+            if (act == false){
+                act = true;
+                eel.set_thread(pk=0);
+            }
+            else{
+                act = false;
+                eel.set_ex(pk=0);
+            }
+        }
+        function get(){
+            eel.get_parsers();
+        }
+        function create_parser_js(){
+
+            let form = document.forms.new_parser; // <form name="my"> element
+
+            // получаем элемент
+            let title = form.elements.Title.value; // <input name="one"> element
+            let url = form.elements.Url.value;
+            let time = form.elements.Time.value;
+            eel.create_parser(title,url,time);
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap">
+    <link rel="stylesheet" href="Main.css">
+    <style>
+        html,body{
+            margin:0;
+            padding:0;
+        }
+        #menu{
+            margin-top: -16px;
+            padding: 0px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+            background: #454545;
+            float: left;
+            width: 150px;
+            height: 100%;
+            text-align: center;
+        }
+        #information{
+            font-family: 'Nunito', sans-serif;
+            min-height: 200px;
+            min-width: 300px;
+        }
+        #menu_title{
+            padding: 10px;
+            background:#262626;
+        }
+        #menu_buttons{
+            padding: 10px 0px;
+        }
+        .butt{
+            padding: 5px;
+        }
+        A {
+    text-decoration: none;
+   }
+    </style>
+
+    <input type="checkbox" id="hmt" class="hidden-menu-ticker">
+        <label class="btn-menu" for="hmt">
+            <span class="first"></span>
+            <span class="second"></span>
+            <span class="third"></span>
+        </label>
+
+        <ul class = "hidden-menu">
+            <p>   Menu  </p>
+            <li> <a  href="" onclick="test()">Поиск книги</a> </li>
+            <li> <a href="">Link 2</a> </li>
+            <li> <a href="" >Link 3</a> </li>
+        </ul>
+</head>
+<body>
+    <div>
+        <div>
+            <a>Информация:</a>
+        </div>
+        <div>
+            <button onclick="start()">Старт</button>
+            <button onclick="get()">Получить парсеры</button>
+        </div>
+        <div>
+            <form name="new_parser">
+                <p><b>Форма создания парсера</b></p>
+                <p><input type="text" name="Title">Название<Br>
+                <input type="text" name="Url">Ссылка<Br>
+                <input type="text" name="Time">Время итерации</p>
+                <p><input type="submit" onclick="create_parser_js()"></p>
+            </form>
+        </div>
+        <div id="information">
+
+        </div>
+    </div>
+</body>
