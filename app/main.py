@@ -1,23 +1,27 @@
 import eel
 import csv
-from app.settings import WIND_SIZE
+from time import time as tm
+from app.settings import WIND_SIZE, DIR_PATH
 from app.models import Avito_parser
 
 
 def close_app():
+    #start = tm()
     for parser in active_parsers:
         if parser.ex == "active":
             set_thread(parser.id)
+    #print(f'Time for start {tm()-start}')
+    #print("##########All parser is working!##########")
 
 
 active_parsers = []
-with open('csv/parsers.csv', 'r', encoding="utf-8") as file:
+with open(DIR_PATH + "\\csv\\parsers.csv", "r", encoding="utf-8") as file:
     reader = csv.reader(file, delimiter=",")
     for row in reader:
         if row != []:
             active_parsers.append(Avito_parser(*row))
-
-eel.init("templates")
+print(DIR_PATH + "\\templates")
+eel.init(DIR_PATH + "\\templates")
 
 
 @eel.expose
@@ -43,7 +47,7 @@ def set_thread(pk):
 
     def my_thread():
         while pars.ex != "not active":
-            pars.find_new_ads(url=pars.url, ads_title=pars.ads, ads_file=pars.ads_file)
+            pars.find_new_ads()
             eel.sleep(pars.time * 60.0)
 
     eel.spawn(my_thread)
@@ -52,20 +56,24 @@ def set_thread(pk):
 @eel.expose
 def create_parser(title, url, time):
     try:
-        new = Avito_parser(title=title, url=url, it=time, pk=len(active_parsers), status='active')  # создает объект парсера
+        start = tm()
+        new = Avito_parser(
+            title=title, url=url, it=time, pk=len(active_parsers), status="active"
+        )  # создает парсер
         active_parsers.append(new)  # добавляет объект в массив активных парсеров
-        new.write_parser()   # записывает параметры парсера в файл
-        new.create_ads_file()   # создает файл для хранения
-        set_thread(len(active_parsers)-1)   # запускает парсер
+        new.write_parser()  # записывает параметры парсера в файл
+        new.create_ads_file()  # создает файл для хранения
+        set_thread(len(active_parsers) - 1)  # запускает парсер
+        print(f"Parser was created {float(tm())-start}")
     except Exception as e:
-        print(f'Ошибка:{e}')
+        print(f"Ошибка:{e}")
 
 
 @eel.expose
 def delete_parser(parsers: list, pk: int):
     set_ex(pk=pk)
     parsers.pop(pk)
-    with open('csv/parsers.csv', 'w', encoding="utf-8") as file:
+    with open("../csv/parsers.csv", "w", encoding="utf-8") as file:
         writer = csv.writer(file, delimiter=",")
         for pars in parsers:
             writer.writerow(pars.title, pars.url, pars.time)
