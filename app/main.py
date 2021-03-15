@@ -7,9 +7,10 @@ from app.models import Avito_parser
 
 def close_app():
     #start = tm()
-    for parser in active_parsers:
-        if parser.ex == "active":
-            set_thread(parser.id)
+    if active_parsers:
+        for parser in active_parsers:
+            if parser.ex == "active":
+                set_thread(parser.id)
     #print(f'Time for start {tm()-start}')
     #print("##########All parser is working!##########")
 
@@ -26,10 +27,11 @@ eel.init(DIR_PATH + "\\templates")
 
 @eel.expose
 def get_parser(pk):
-    if active_parsers[pk].ex == "active":
-        return True
-    else:
-        return False
+    if active_parsers:
+        if active_parsers[pk].ex == "active":
+            return True
+        else:
+            return False
 
 
 @eel.expose
