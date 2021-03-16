@@ -8,53 +8,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap">
     <link rel="stylesheet" href="Main.css">
     <style>
-        html,body{
-            margin:0;
-            padding:0;
-        }
-        #menu{
-            margin-top: -16px;
-            padding: 0px;
-            color: white;
-            font-family: 'Nunito', sans-serif;
-            background: #454545;
-            float: left;
-            width: 150px;
-            height: 100%;
-            text-align: center;
-        }
-        #information{
-            font-family: 'Nunito', sans-serif;
-        }
-        #menu_title{
-            padding: 10px;
-            background:#262626;
-        }
-        #menu_buttons{
-            padding: 10px 0px;
-        }
-        .butt{
-            padding: 5px;
-        }
-        A {ё
+      
+        A {
     text-decoration: none;
    } 
     </style>
 
     <input type="checkbox" id="hmt" class="hidden-menu-ticker">
         <label class="btn-menu" for="hmt">
-            <span class="first"></span>
-            <span class="second"></span>
-            <span class="third"></span>
+                <span class="first"></span>
+                <span class="second"></span>
+                <span class="third"></span>          
         </label>
+        <div class="circle"> </div>
 
+
+    
+    
         <ul class = "hidden-menu"> 
             <p>   Menu  </p>       
-            <li> <a  href="" onclick="test()">Поиск книги</a> </li>
+            <li> <a  href="Proverka.html">Поиск книги</a> </li>
             <li> <a href="">Link 2</a> </li>
-            <li> <a href="" >Link 3</a> </li>
+            <li> <a href="">Link 3</a> </li>
         </ul>
+
+        <label class ="child" for="hmt"> </label>
+
+
 </head>
 <body>
+    <div  class="container">
+        <main id="swup" class="transition-fade"></main>
+    </div>
+    <script src ="swup.min.js"></script>
+    <script>
+        const swup = new Sup();
+    </script>
+
     
+
+   </main>
 </body>
