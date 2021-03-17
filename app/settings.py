@@ -2,6 +2,7 @@ import os
 import vk_api
 from pathlib import Path
 
+
 WIND_SIZE = (800, 600)
 
 DIR_PATH = str(Path(os.getcwd()).parent)

@@ -6,35 +6,12 @@
     <script type="text/javascript" src="/eel.js"></script>
     <title>Title</title>
     <script>
-        var act = eel.get_parser(0);
         eel.expose(print);
+        eel.loop();
         function print(x){
             var elem = document.getElementById("information");
             var resp = "\n<br>" + x;
             elem.innerHTML += resp;
-        }
-        function start(){
-            if (act == false){
-                act = true;
-                eel.set_thread(pk=0);
-            }
-            else{
-                act = false;
-                eel.set_ex(pk=0);
-            }
-        }
-        function get(){
-            eel.get_parsers();
-        }
-        function create_parser_js(){
-
-            let form = document.forms.new_parser; // <form name="my"> element
-
-            // получаем элемент
-            let title = form.elements.Title.value; // <input name="one"> element
-            let url = form.elements.Url.value;
-            let time = form.elements.Time.value;
-            eel.create_parser(title,url,time);
         }
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
