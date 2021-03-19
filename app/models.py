@@ -1,4 +1,3 @@
-import os
 import csv
 import random
 import eel
@@ -27,14 +26,6 @@ class Avito_parser:
             DIR_PATH + "\\csv\\" + self.title + "_ads.csv"
         )  # файл для хранения данных
 
-    def edit_or_create_ads_file(self):
-        if os.path.exists(self.ads_file):
-            mode = "a"
-        else:
-            mode = "w"
-        with open(self.ads_file, mode):
-            self.find_new_ads(mode=False)
-
     def write_parser(self):
         with open("../csv/parsers.csv", "a", encoding="utf-8") as file:
             writer = csv.writer(file, delimiter=",")
@@ -42,8 +33,6 @@ class Avito_parser:
 
     def __str__(self):
         return "Парсер " + self.title
-
-    # функция отправки сообщения
 
     # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
     def find_new_ads(
