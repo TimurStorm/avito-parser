@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <title>Title</title>
+    <style>
+        @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+        body{
+            display: flex;
+            margin-top: 0%;
+            justify-content: left;
+            align-items: center;
+            height: 100%;
+        }
+        nav{
+            background-color: #585555;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            width:100%;
+            height: 50px;
+        }
+        ul{
+            
+            align-self: flex-start;
+            background: #eee;
+            margin-left: 0%;
+            padding: 0;
+            position:fixed;
+            top: 50px;
+            width: 100%;
+        }
+        li{
+            align-items: center;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            font-size: 1.5em;
+            height: 2em;
+            justify-content: center;
+            list-style-type: none;
+            text-transform: uppercase;
+            transition: all .3s ease;
+        }
+        li:hover{
+            background-color: #585555;
+            color: #affeaa;
+        }
+        #app
+        {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            width: 500px;
+            height: 850px;
+        }
+        @media(max-width: 1920px)
+        {
+            #app{
+                width: 100vw;
+                height: 100%;
+            }
+        }
+
+        .fade-enter-active,
+        .fade-leave-active
+        {
+            transition: opacity .3s ease ;
+        }
+        .fade-enter-active,
+        .fade-leave-to
+        {
+            opacity: 0;
+        }
+        .menu,.clear{
+            cursor: pointer;
+            font-size:3em;
+            padding-left: 0%;
+            transition: all .3s ease;
+            width: 1.5em;
+            color:#ffff;
+        }
+    </style>
+</head>
+<body>
+
+   <div id="app">
+    
+       <nav>
+        
+            <transition name="fade" mode="out-in">
+                <i class="material-icons menu" v-if="!show" @click="show = !show" key = "menu" >menu</i>
+                 
+                <i class="material-icons clear" v-else @click="show = !show" key ="clear">clear</i>
+                </transition>
+            <transition name = "fade">
+                <ul v-if ="show">
+                    <li v-for="item in items">
+                        {{item}}
+                    </li>
+                </ul>
+            <trnsition>
+
+            </trnsition>
+       </nav>
+   </div>
+   <script src="vue.js"></script>
+   <script src="script.js"></script>
+</body>
+</html>
