@@ -6,36 +6,36 @@
     <script type="text/javascript" src="/eel.js"></script>
     <title>Title</title>
     <script>
+        var act = eel.get_parser(0);
         eel.expose(print);
-        eel.loop();
-        var title = "";
-        var url = "";
-        var time = "";
         function print(x){
             var elem = document.getElementById("information");
             var resp = "\n<br>" + x;
             elem.innerHTML += resp;
         }
-        eel.expose(print);
-        function wait_new_parser_js(){
-            if((title != "") && (url != "") && (time != "")){
-                return [ title, url, time];
+        function start(){
+            if (act == false){
+                act = true;
+                eel.set_thread(pk=0);
             }
-            return false;
+            else{
+                act = false;
+                eel.set_ex(pk=0);
+            }
         }
-        eel.expose(wait_new_parser_js);
+        function get(){
+            eel.get_parsers();
+        }
         function create_parser_js(){
-            title = document.getElementById('Title').value;
-            url = document.getElementById('Url').value;
-            time = document.getElementById('Time').value;
-        }
-        eel.expose(all_is_none)
-        function all_is_none(){
-            title = "";
-            url = "";
-            time = "";
-        }
 
+            let form = document.forms.new_parser; // <form name="my"> element
+
+            // получаем элемент
+            let title = form.elements.Title.value; // <input name="one"> element
+            let url = form.elements.Url.value;
+            let time = form.elements.Time.value;
+            eel.create_parser(title,url,time);
+        }
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap">
@@ -100,13 +100,13 @@
             <button onclick="get()">Получить парсеры</button>
         </div>
         <div>
-            <div id="new_parser">
+            <form name="new_parser">
                 <p><b>Форма создания парсера</b></p>
-                <p><input id="Title" type="text" name="Title">Название<Br>
-                <input id="Url" type="text" name="Url">Ссылка<Br>
-                <input id="Time" type="text" name="Time">Время итерации</p>
+                <p><input type="text" name="Title">Название<Br>
+                <input type="text" name="Url">Ссылка<Br>
+                <input type="text" name="Time">Время итерации</p>
                 <p><input type="submit" onclick="create_parser_js()"></p>
-            </div>
+            </form>
         </div>
         <div id="information">
 
