@@ -2,7 +2,7 @@ import csv
 import random
 import eel
 from time import sleep
-from .settings import DIR_PATH, VK
+from app.settings import DIR_PATH, VK, ACTIVE_PARSERS
 
 
 def send_message(text):
@@ -15,21 +15,29 @@ def send_message(text):
 
 
 class Avito_parser:
-    def __init__(self, pk, title, url, it, status="not active"):
+    def __init__(self, pk, title, url, it, status="active"):
         self.id = int(pk)  # индекс
         self.title = title.strip()  # название
         self.url = url  # ссылка
         self.ads = []  # объявления
-        self.ex = status.strip()  # параметр выхода из потока
+        self.status = status.strip()  # параметр выхода из потока
         self.time = int(it)  # время итерации в минутах
         self.ads_file = (
             DIR_PATH + "\\csv\\" + self.title + "_ads.csv"
         )  # файл для хранения данных
 
-    def write_parser(self):
-        with open("../csv/parsers.csv", "a", encoding="utf-8") as file:
-            writer = csv.writer(file, delimiter=",")
-            writer.writerow([self.id, self.title, self.url, self.time, self.ex])
+    def write_parser(self, mode=False):
+        if mode:
+            with open("../csv/parsers.csv", "w", encoding="utf-8") as file:
+                writer = csv.writer(file, delimiter=",")
+                writer.writerows(
+                    [parser.id, parser.title, parser.url, parser.time, parser.status]
+                    for parser in ACTIVE_PARSERS
+                )
+        else:
+            with open("../csv/parsers.csv", "a", encoding="utf-8") as file:
+                writer = csv.writer(file, delimiter=",")
+                writer.writerow([self.id, self.title, self.url, self.time, self.status])
 
     def __str__(self):
         return "Парсер " + self.title
@@ -67,7 +75,7 @@ class Avito_parser:
                 # если объявления нет в списке
                 if new.url not in ads_title:
 
-                    ads_title.append(new)
+                    ads_title.append(new.url)
                     # записываем в файл новое объявление
                     writer.writerow([new.title, new.url])
                     if mode:
@@ -76,7 +84,9 @@ class Avito_parser:
                             text="Новое объявление!" + "\n" + title + "\n" + link
                         )
                         # выводит уведомление в приложении
-                        eel.print("New Ad!" + "\n" + title + "\n" + link)
+                        eel.print(
+                            "----------New Ad!" + "\n" + title + "\n" + link, self.title
+                        )
 
 
 class Ad:

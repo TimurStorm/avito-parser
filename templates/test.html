@@ -9,17 +9,18 @@
         eel.expose(print);
         eel.loop();
         var title = "";
+        var page = "";
         var url = "";
         var time = "";
-        function print(x){
-            var elem = document.getElementById("information");
+        function print(x, place){
+            var elem = document.getElementById(place);
             var resp = "\n<br>" + x;
             elem.innerHTML += resp;
         }
         eel.expose(print);
         function wait_new_parser_js(){
-            if((title != "") && (url != "") && (time != "")){
-                return [ title, url, time];
+            if((title != "") && (url != "") && (time != "") && (page != "")){
+                return [ title, url, time, page];
             }
             return false;
         }
@@ -28,16 +29,19 @@
             title = document.getElementById('Title').value;
             url = document.getElementById('Url').value;
             time = document.getElementById('Time').value;
+            page = document.getElementById('Page').value;
         }
         eel.expose(all_is_none)
         function all_is_none(){
             title = "";
             url = "";
             time = "";
+            page = "";
         }
 
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap">
     <link rel="stylesheet" href="Main.css">
     <style>
@@ -56,10 +60,17 @@
             height: 100%;
             text-align: center;
         }
-        #information{
-            font-family: 'Nunito', sans-serif;
-            min-height: 200px;
-            min-width: 300px;
+        .information{
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Fira Code', monospace;
+            color: white;
+            background: black;
+            height: 400px;
+            width: 40%;
+            float: left;
+            padding-right:20px;
+            overflow: auto;
         }
         #menu_title{
             padding: 10px;
@@ -104,11 +115,15 @@
                 <p><b>Форма создания парсера</b></p>
                 <p><input id="Title" type="text" name="Title">Название<Br>
                 <input id="Url" type="text" name="Url">Ссылка<Br>
+                    <input id="Page" type="text" name="Page">Количество страниц для анализа<Br>
                 <input id="Time" type="text" name="Time">Время итерации</p>
                 <p><input type="submit" onclick="create_parser_js()"></p>
             </div>
         </div>
-        <div id="information">
+        <div class="information" id="Monitor">
+
+        </div>
+        <div class="information" id="xbox">
 
         </div>
     </div>
