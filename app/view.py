@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 from time import time as tm
-from app.settings import ACTIVE_PARSERS
+from app.settings import ACTIVE_PARSERS, CURSOR
 from app.settings import MAIN_LOOP
 
 
@@ -101,6 +101,7 @@ async def wait_new_parser():
                 )
                 # добавление парсера в список активных
                 new.write_parser()
+                #CURSOR.execute(f"""CREATE TABLE {new.title} (title, url, time, status) """)
                 ACTIVE_PARSERS.append(new)
                 eel.print("Create new parser")
                 futures = [

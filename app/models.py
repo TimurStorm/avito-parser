@@ -1,7 +1,6 @@
 import csv
 import random
 import eel
-from time import sleep
 from app.settings import DIR_PATH, VK, ACTIVE_PARSERS
 
 
@@ -11,7 +10,6 @@ def send_message(text):
         message=text,
         random_id=random.randint(-2147483648, +2147483647),
     )
-    sleep(0.5)
 
 
 class Avito_parser:
@@ -83,6 +81,7 @@ class Avito_parser:
                         send_message(
                             text="Новое объявление!" + "\n" + title + "\n" + link
                         )
+
                         # выводит уведомление в приложении
                         eel.print(
                             "----------New Ad!" + "\n" + title + "\n" + link, self.title

@@ -15,6 +15,7 @@ black = "^20.8b1"
 Jinja2 = "^2.11.3"
 Scrapy = "^2.4.1"
 vkbottle = "^2.7.12"
+pyinstaller = "^4.2"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,6 +1,7 @@
 import asyncio
 import os
 import vk_api
+import sqlite3
 from pathlib import Path
 
 WIND_SIZE = (800, 600)
@@ -14,3 +15,7 @@ VK = session.get_api()
 ACTIVE_PARSERS = []
 
 MAIN_LOOP = asyncio.get_event_loop()
+
+
+conn = sqlite3.connect("database.db")
+CURSOR = conn.cursor()
