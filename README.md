@@ -1,6 +1,6 @@
 # Avito-parser
 
-## Python:
+## Установка:
 #### 1) Установить [PyCharm](https://www.jetbrains.com/ru-ru/pycharm/).
 #### 2) Открыть проект в PyCharm.
 #### 3) Установить пакет poetry через терминал:
