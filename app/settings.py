@@ -19,3 +19,5 @@ MAIN_LOOP = asyncio.get_event_loop()
 
 conn = sqlite3.connect("database.db")
 CURSOR = conn.cursor()
+
+API_ID = 7802615

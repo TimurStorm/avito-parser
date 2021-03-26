@@ -1,5 +1,6 @@
 from datetime import datetime
-
+import requests
+import webbrowser
 from app.models import *
 import os
 import eel
@@ -7,7 +8,7 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 from time import time as tm
-from app.settings import ACTIVE_PARSERS, CURSOR
+from app.settings import ACTIVE_PARSERS, API_ID
 from app.settings import MAIN_LOOP
 
 
@@ -101,7 +102,7 @@ async def wait_new_parser():
                 )
                 # добавление парсера в список активных
                 new.write_parser()
-                #CURSOR.execute(f"""CREATE TABLE {new.title} (title, url, time, status) """)
+                # CURSOR.execute(f"""CREATE TABLE {new.title} (title, url, time, status) """)
                 ACTIVE_PARSERS.append(new)
                 eel.print("Create new parser")
                 futures = [
@@ -132,3 +133,12 @@ def parser_stop(parser_id: Avito_parser):
     parser.status = "not active"
 
     parser.write_parser(mode=True)
+
+
+def vk_auth():
+    url = (
+            "https://oauth.vk.com/authorize?client_id="
+            + str(API_ID)
+            + "&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=offline&response_type=token&v=5.5"
+    )
+    webbrowser.open_new_tab(url)
