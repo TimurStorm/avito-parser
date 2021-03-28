@@ -130,5 +130,4 @@ async def parser_work(parser):
 def parser_stop(parser_id: Avito_parser):
     parser = ACTIVE_PARSERS[parser_id]
     parser.status = "not active"
-
     parser.write_parser(mode=True)

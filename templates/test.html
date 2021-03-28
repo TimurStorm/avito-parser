@@ -38,6 +38,9 @@
             time = "";
             page = "";
         }
+        function vk(){
+            eel.vk_auth_window();
+        }
 
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -109,6 +112,7 @@
         <div>
             <button onclick="start()">Старт</button>
             <button onclick="get()">Получить парсеры</button>
+            <button onclick="vk()">ВК</button>
         </div>
         <div>
             <div id="new_parser">
@@ -120,7 +124,7 @@
                 <p><input type="submit" onclick="create_parser_js()"></p>
             </div>
         </div>
-        <div class="information" id="Monitor">
+        <div class="information" id="videocard">
 
         </div>
         <div class="information" id="xbox">

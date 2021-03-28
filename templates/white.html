@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <script>
+        eel.expose(write);
+        function write(x){
+            var elem = document.getElementById("info");
+            var resp = "<br>" + x;
+            elem.innerHTML += resp;
+        }
+
+    </script>
+</head>
+<body>
+    <button onclick="write(1)">test</button>
+    <div id="info">
+        <a></a>
+    </div>
+</body>
+</html>

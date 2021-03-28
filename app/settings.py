@@ -16,6 +16,9 @@ ACTIVE_PARSERS = []
 
 MAIN_LOOP = asyncio.get_event_loop()
 
+API_ID = 7802615
 
 conn = sqlite3.connect("database.db")
 CURSOR = conn.cursor()
+
+VK_FORM = ""

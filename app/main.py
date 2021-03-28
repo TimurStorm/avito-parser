@@ -1,7 +1,9 @@
+import aiohttp
 import eel
 import csv
 import asyncio
-from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP
+from bs4 import BeautifulSoup
+from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP, API_ID, VK_FORM
 from app.models import Avito_parser
 from app.view import wait_new_parser, parser_work
 
@@ -25,6 +27,21 @@ def loop():
     tasks.append(wait_new_parser())
 
     MAIN_LOOP.run_until_complete(asyncio.gather(*tasks))
+
+
+async def vk_auth_form():
+    url = f"https://oauth.vk.com/authorize?client_id={API_ID}&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.52"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            page_info = await response.text()
+            VK_FORM = str(BeautifulSoup(page_info, 'lxml'))
+
+
+@eel.expose
+def vk_auth_window():
+
+    eel.show("vk_auth.html")
+    #asyncio.create_task(vk_auth_form())
 
 
 # close_callback - функция для закрытия приложения
