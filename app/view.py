@@ -101,7 +101,7 @@ async def wait_new_parser():
                 )
                 # добавление парсера в список активных
                 new.write_parser()
-                #CURSOR.execute(f"""CREATE TABLE {new.title} (title, url, time, status) """)
+                # CURSOR.execute(f"""CREATE TABLE {new.title} (title, url, time, status) """)
                 ACTIVE_PARSERS.append(new)
                 eel.print("Create new parser")
                 futures = [

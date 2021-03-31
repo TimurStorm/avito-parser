@@ -39,7 +39,11 @@
             page = "";
         }
         function vk(){
-            eel.vk_auth_window();
+            eel.vk_auth();
+        }
+        function test_auth(){
+            print(1);
+            eel.set_security_code();
         }
 
     </script>
@@ -113,6 +117,7 @@
             <button onclick="start()">Старт</button>
             <button onclick="get()">Получить парсеры</button>
             <button onclick="vk()">ВК</button>
+            <button onclick="test_auth()">Тест</button>
         </div>
         <div>
             <div id="new_parser">

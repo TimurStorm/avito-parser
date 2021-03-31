@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP, API_ID, VK_FORM
 from app.models import Avito_parser
 from app.view import wait_new_parser, parser_work
+from auth.vk import VKAuth
 
 with open(DIR_PATH + "\\csv\\parsers.csv", "r", encoding="utf-8") as file:
     reader = csv.reader(file, delimiter=",")
@@ -29,19 +30,16 @@ def loop():
     MAIN_LOOP.run_until_complete(asyncio.gather(*tasks))
 
 
-async def vk_auth_form():
-    url = f"https://oauth.vk.com/authorize?client_id={API_ID}&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.52"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            page_info = await response.text()
-            VK_FORM = str(BeautifulSoup(page_info, 'lxml'))
-
-
 @eel.expose
-def vk_auth_window():
+def vk_auth():
+    """
+    Реадизовать методы на получение пароля, почты и одноразового кода
+    """
+    session = VKAuth(['friends'], API_ID, '11.9.1', pswd="000168154Tim", email="noobofmylive@gmail.com")
+    session.auth()
 
-    eel.show("vk_auth.html")
-    #asyncio.create_task(vk_auth_form())
+    access_token = session.get_token()
+    print(access_token)
 
 
 # close_callback - функция для закрытия приложения
