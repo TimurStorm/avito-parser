@@ -6,12 +6,15 @@
     <script type="text/javascript" src="/eel.js"></script>
     <title>Title</title>
     <script>
-        eel.expose(print);
         eel.loop();
         var title = "";
         var page = "";
         var url = "";
         var time = "";
+        var email = "";
+        var pass = "";
+        var sec_code = "";
+        var auth_proc = false;
         function print(x, place){
             var elem = document.getElementById(place);
             var resp = "\n<br>" + x;
@@ -45,7 +48,42 @@
             print(1);
             eel.set_security_code();
         }
-
+        eel.expose(vk_auth_get_ep);
+        function vk_auth_get_ep(){
+            return [email, pass];
+        }
+        function vk_auth_js(){
+            email = document.getElementById('Email').value;
+            pass = document.getElementById('Password').value;
+            if (!auth_proc){
+                if ((email != "") && (pass != "")){
+                    eel.vk_auth();
+                    auth_proc = true;
+                    }
+                }
+        }
+        eel.expose(set_auth_proc_false);
+        function set_auth_params_false(){
+            auth_proc = false;
+        }
+        eel.expose(vk_auth_set_ep_null);
+        function vk_auth_set_ep_null(){
+            email = "";
+            pass = "";
+        }
+        eel.expose(get_security_code);
+        function get_security_code(){
+            if (sec_code != ""){
+                return sec_code;
+                }
+            else{
+                return null;
+                }
+        }
+        function set_code(){
+            sec_code = document.getElementById('Code').value;
+            print(sec_code,"xbox");
+        }
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
@@ -127,6 +165,17 @@
                     <input id="Page" type="text" name="Page">Количество страниц для анализа<Br>
                 <input id="Time" type="text" name="Time">Время итерации</p>
                 <p><input type="submit" onclick="create_parser_js()"></p>
+            </div>
+            <div id="new_vk">
+                <p><b>Форма авторизации</b></p>
+                <p><input id="Email" type="text" name="Email">Почта<Br>
+                <input id="Password" type="text" name="Password">Пароль<Br></p>
+                <p><input type="submit" onclick="vk_auth_js()"></p>
+            </div>
+            <div id="ode">
+                <p><b>Форма кода</b></p>
+                <p><input id="Code" type="text" name="Code">Код<Br></p>
+                <p><input type="submit" onclick="set_code()"></p>
             </div>
         </div>
         <div class="information" id="videocard">

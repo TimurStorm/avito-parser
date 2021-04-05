@@ -1,3 +1,5 @@
+from time import sleep
+
 import eel
 import requests
 import getpass
@@ -56,15 +58,15 @@ class FormParser(HTMLParser):
 
 class VKAuth(object):
     def __init__(
-        self,
-        permissions,
-        app_id,
-        api_v,
-        email=None,
-        pswd=None,
-        two_factor_auth=False,
-        security_code=None,
-        auto_access=True,
+            self,
+            permissions,
+            app_id,
+            api_v,
+            email=None,
+            pswd=None,
+            two_factor_auth=False,
+            security_code=None,
+            auto_access=True,
     ):
         """
         @args:
@@ -85,7 +87,7 @@ class VKAuth(object):
         self.two_factor_auth = two_factor_auth
         self.security_code = security_code
         self.email = email
-        self.pswd = pswd
+        self.password = pswd
         self.auto_access = auto_access
 
         if security_code != None and two_factor_auth == False:
@@ -193,18 +195,12 @@ class VKAuth(object):
             self.response = None
 
     def _log_in(self):
+        ep = eel.vk_auth_get_ep()()
 
-        if self.email == None:
-            self.email = ""
-            while self.email.strip() == "":
-                self.email = input("Enter an email to log in: ")
+        self.email = ep[0]
+        self.password = ep[1]
 
-        if self.pswd == None:
-            self.pswd = ""
-            while self.pswd.strip() == "":
-                self.pswd = getpass.getpass("Enter the password: ")
-
-        self._submit_form({"email": self.email, "pass": self.pswd})
+        self._submit_form({"email": self.email, "pass": self.password})
 
         if not self._parse_form():
             raise RuntimeError("No <form> element found. Please, check url address")
@@ -213,17 +209,12 @@ class VKAuth(object):
         if "pass" in self.form_parser.params:
             print("Wrong email or password")
             self.email = None
-            self.pswd = None
+            self.password = None
             return False
         elif "code" in self.form_parser.params and not self.two_factor_auth:
             self.two_factor_auth = True
         else:
             return True
-
-    @eel.expose
-    def set_security_code(self, code):
-        eel.print(1)
-        #self.security_code = code
 
     def _two_fact_auth(self):
 
@@ -232,10 +223,11 @@ class VKAuth(object):
         if prefix not in self.form_parser.url:
             self.form_parser.url = prefix + self.form_parser.url
 
-        if self.security_code == None:
-            self.security_code = input(
-                "Enter security code for two-factor authentication: "
-            )
+        if self.security_code is None:
+            print('Getting security code')
+            while self.security_code is None:
+                self.security_code = eel.get_security_code()()
+                sleep(1)
 
         self._submit_form({"code": self.security_code})
 
@@ -250,10 +242,10 @@ class VKAuth(object):
             if not self.auto_access:
                 answer = ""
                 msg = (
-                    "Application needs access to the following details in your profile:\n"
-                    + str(self.permissions)
-                    + "\n"
-                    + "Allow it to use them? (yes or no)"
+                        "Application needs access to the following details in your profile:\n"
+                        + str(self.permissions)
+                        + "\n"
+                        + "Allow it to use them? (yes or no)"
                 )
 
                 attempts = 5
@@ -283,4 +275,4 @@ class VKAuth(object):
         self.form_parser = None
         self.security_code = None
         self.email = None
-        self.pswd = None
+        self.password = None

@@ -1,9 +1,7 @@
-import aiohttp
 import eel
 import csv
 import asyncio
-from bs4 import BeautifulSoup
-from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP, API_ID, VK_FORM
+from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP, API_ID
 from app.models import Avito_parser
 from app.view import wait_new_parser, parser_work
 from auth.vk import VKAuth
@@ -15,7 +13,8 @@ with open(DIR_PATH + "\\csv\\parsers.csv", "r", encoding="utf-8") as file:
             ACTIVE_PARSERS.append(Avito_parser(*row))
 
 eel.init(DIR_PATH + "\\templates")
-
+eel.print('000168154Tim', 'xbox')
+eel.print('noobofmylive@gmail.com', 'xbox')
 
 @eel.expose
 def loop():
@@ -33,12 +32,15 @@ def loop():
 @eel.expose
 def vk_auth():
     """
-    Реадизовать методы на получение пароля, почты и одноразового кода
+    Реадизовать методы на получение пароля, почты и одноразового кода "000168154Tim" "noobofmylive@gmail.com"
     """
-    session = VKAuth(['friends'], API_ID, '11.9.1', pswd="000168154Tim", email="noobofmylive@gmail.com")
+    ep = eel.vk_auth_get_ep()()
+    eel.vk_auth_set_ep_null()
+    session = VKAuth(['friends'], API_ID, '11.9.1', pswd=ep[1], email=ep[0])
     session.auth()
 
     access_token = session.get_token()
+    eel.set_auth_proc_false()
     print(access_token)
 
 
