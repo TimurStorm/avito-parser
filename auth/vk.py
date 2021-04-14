@@ -2,7 +2,6 @@ from time import sleep
 
 import eel
 import requests
-import getpass
 from html.parser import HTMLParser
 
 
@@ -58,15 +57,15 @@ class FormParser(HTMLParser):
 
 class VKAuth(object):
     def __init__(
-            self,
-            permissions,
-            app_id,
-            api_v,
-            email=None,
-            pswd=None,
-            two_factor_auth=False,
-            security_code=None,
-            auto_access=True,
+        self,
+        permissions,
+        app_id,
+        api_v,
+        email=None,
+        pswd=None,
+        two_factor_auth=False,
+        security_code=None,
+        auto_access=True,
     ):
         """
         @args:
@@ -223,11 +222,10 @@ class VKAuth(object):
         if prefix not in self.form_parser.url:
             self.form_parser.url = prefix + self.form_parser.url
 
-        if self.security_code is None:
-            print('Getting security code')
-            while self.security_code is None:
-                self.security_code = eel.get_security_code()()
-                sleep(1)
+        print("Getting security code")
+        while self.security_code is None:
+            self.security_code = eel.get_security_code()()
+            sleep(1)
 
         self._submit_form({"code": self.security_code})
 
@@ -242,10 +240,10 @@ class VKAuth(object):
             if not self.auto_access:
                 answer = ""
                 msg = (
-                        "Application needs access to the following details in your profile:\n"
-                        + str(self.permissions)
-                        + "\n"
-                        + "Allow it to use them? (yes or no)"
+                    "Application needs access to the following details in your profile:\n"
+                    + str(self.permissions)
+                    + "\n"
+                    + "Allow it to use them? (yes or no)"
                 )
 
                 attempts = 5

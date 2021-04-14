@@ -1,7 +1,6 @@
-import csv
 import random
 import eel
-from app.settings import DIR_PATH, VK, ACTIVE_PARSERS
+from app.settings import VK
 
 
 def send_message(text):
@@ -13,29 +12,13 @@ def send_message(text):
 
 
 class Avito_parser:
-    def __init__(self, pk, title, url, it, status="active"):
-        self.id = int(pk)  # индекс
+    def __init__(self, title, url, it, count, status="active"):
         self.title = title.strip()  # название
         self.url = url  # ссылка
+        self.count = int(count)
         self.ads = []  # объявления
         self.status = status.strip()  # параметр выхода из потока
         self.time = int(it)  # время итерации в минутах
-        self.ads_file = (
-            DIR_PATH + "\\csv\\" + self.title + "_ads.csv"
-        )  # файл для хранения данных
-
-    def write_parser(self, mode=False):
-        if mode:
-            with open("../csv/parsers.csv", "w", encoding="utf-8") as file:
-                writer = csv.writer(file, delimiter=",")
-                writer.writerows(
-                    [parser.id, parser.title, parser.url, parser.time, parser.status]
-                    for parser in ACTIVE_PARSERS
-                )
-        else:
-            with open("../csv/parsers.csv", "a", encoding="utf-8") as file:
-                writer = csv.writer(file, delimiter=",")
-                writer.writerow([self.id, self.title, self.url, self.time, self.status])
 
     def __str__(self):
         return "Парсер " + self.title
@@ -47,45 +30,40 @@ class Avito_parser:
         new_ad=None,
     ):
 
-        ads_file = self.ads_file
-        ads_title = self.ads
+        ads_url = self.ads
+        ads_new = []  # список новых объявлений
 
-        with open(ads_file, encoding="utf-8") as file:
-            reader = csv.reader(file, delimiter=",")
-            for row in reader:
-                ads_title.append(row[1])
-        with open(ads_file, mode="a", encoding="utf-8") as file:
-            writer = csv.writer(
-                file,
-                delimiter=",",
-                lineterminator="\r",
-            )
+        for ad in new_ad:
+            # ищем информацию о каждом объявлении
+            info = ad.find("div", attrs={"class": "iva-item-body-NPl6W"})
+            title_link = info.find("a", attrs={"data-marker": "item-title"})
+            title = title_link.find("h3").get_text()
+            link = "https://www.avito.ru" + title_link.get("href")
+            price = info.find("span", attrs={"data-marker": "item-price"})\
+                .find('span', attrs={"class": "price-text-1HrJ_ text-text-1PdBw text-size-s-1PUdo"}).get_text()
 
-            for ad in new_ad:
-                # ищем информацию о каждом объявлении
-                info = ad.find("div", attrs={"class": "iva-item-body-NPl6W"})
-                title_link = info.find("a", attrs={"data-marker": "item-title"})
-                title = title_link.find("h3").get_text()
-                link = "https://www.avito.ru" + title_link.get("href")
+            # для удобства создаём новый объект класса Ad
+            new = Ad(title, link, price)
 
-                new = Ad(title, link, 1)
+            # если объявления нет в списке
+            if new.url not in ads_url:
 
-                # если объявления нет в списке
-                if new.url not in ads_title:
+                # добавляем новое объявление в список для бд и будующей проверки
+                ads_new.append((new.title, new.url, new.price))
+                self.ads.append(new.url)
 
-                    ads_title.append(new.url)
-                    # записываем в файл новое объявление
-                    writer.writerow([new.title, new.url])
-                    if mode:
-                        # присылает уведомление в ВК
-                        send_message(
-                            text="Новое объявление!" + "\n" + title + "\n" + link
-                        )
+                if mode:
+                    # присылает уведомление в ВК
+                    send_message(
+                        text="Новое объявление!" + "\n" + title + "\n" + link
+                    )
 
-                        # выводит уведомление в приложении
-                        eel.print(
-                            "----------New Ad!" + "\n" + title + "\n" + link, self.title
-                        )
+                    # выводит уведомление в приложении
+                    eel.print(
+                        "----------New Ad!" + "\n" + title + "\n" + link, self.title
+                    )
+
+        return ads_new
 
 
 class Ad:
@@ -93,3 +71,6 @@ class Ad:
         self.title = title
         self.price = price
         self.url = url
+
+    def __str__(self):
+        return f"Объявление: {self.title} по цене {self.price}"

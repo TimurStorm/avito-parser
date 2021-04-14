@@ -1,20 +1,21 @@
 import eel
-import csv
 import asyncio
-from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP, API_ID
+import vk_api
+from app.settings import WIND_SIZE, DIR_PATH, ACTIVE_PARSERS, MAIN_LOOP, API_ID, CURSOR
 from app.models import Avito_parser
 from app.view import wait_new_parser, parser_work
 from auth.vk import VKAuth
 
-with open(DIR_PATH + "\\csv\\parsers.csv", "r", encoding="utf-8") as file:
-    reader = csv.reader(file, delimiter=",")
-    for row in reader:
-        if row != []:
-            ACTIVE_PARSERS.append(Avito_parser(*row))
+CURSOR.execute("""CREATE TABLE IF NOT EXISTS parsers (name, url , timer, count, status)""")
+
+CURSOR.execute("""SELECT * from parsers""")
+parsers = CURSOR.fetchall()
+for parser in parsers:
+    parser = list(parser)
+    if parser[4] == "active":
+        ACTIVE_PARSERS.append(Avito_parser(*parser))
 
 eel.init(DIR_PATH + "\\templates")
-eel.print('000168154Tim', 'xbox')
-eel.print('noobofmylive@gmail.com', 'xbox')
 
 @eel.expose
 def loop():
@@ -36,12 +37,14 @@ def vk_auth():
     """
     ep = eel.vk_auth_get_ep()()
     eel.vk_auth_set_ep_null()
-    session = VKAuth(['friends'], API_ID, '11.9.1', pswd=ep[1], email=ep[0])
+    session = VKAuth(["friends"], API_ID, "11.9.1", pswd=ep[1], email=ep[0])
     session.auth()
 
     access_token = session.get_token()
-    eel.set_auth_proc_false()
-    print(access_token)
+    session = vk_api.VkApi(token=access_token)
+    VK = session.get_api()
+    info = VK.account.getProfileInfo()
+    eel.print(f"{info}", "xbox")
 
 
 # close_callback - функция для закрытия приложения

@@ -62,10 +62,6 @@
                     }
                 }
         }
-        eel.expose(set_auth_proc_false);
-        function set_auth_params_false(){
-            auth_proc = false;
-        }
         eel.expose(vk_auth_set_ep_null);
         function vk_auth_set_ep_null(){
             email = "";
@@ -75,11 +71,10 @@
         function get_security_code(){
             if (sec_code != ""){
                 return sec_code;
-                }
-            else{
-                return null;
-                }
+            }
+            return;
         }
+
         function set_code(){
             sec_code = document.getElementById('Code').value;
             print(sec_code,"xbox");
@@ -178,10 +173,10 @@
                 <p><input type="submit" onclick="set_code()"></p>
             </div>
         </div>
-        <div class="information" id="videocard">
+        <div class="information" id="Camry">
 
         </div>
-        <div class="information" id="xbox">
+        <div class="information" id="books">
 
         </div>
     </div>
