@@ -1,11 +1,16 @@
 from datetime import datetime
 from app.models import *
 import eel
-import asyncio
 import aiohttp
+from random import randint
 from bs4 import BeautifulSoup
 from time import time as tm
-from app.settings import ACTIVE_PARSERS, CURSOR, CONN, MAIN_LOOP
+from app.models import Avito_parser
+from app.settings import *
+
+"""
+Файл для основных методов
+"""
 
 
 async def edit_or_create_ads_file(parser: Avito_parser):
@@ -13,9 +18,7 @@ async def edit_or_create_ads_file(parser: Avito_parser):
 
     for i in range(parser.count):
         futures.append(
-            MAIN_LOOP.create_task(
-                get(parser=parser, cycle=False, mode=False, page=i)
-            )
+            MAIN_LOOP.create_task(get(parser=parser, cycle=False, mode=False, page=i))
         )
     await asyncio.gather(*futures)
 
@@ -55,28 +58,28 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
 
                 all_ads = soup.find("div", attrs={"data-marker": "catalog-serp"})
                 # все сведения об объявлениях
-                ads = all_ads.find_all(
-                    "div", attrs={"data-marker": "item"}
-                )
+                ads = all_ads.find_all("div", attrs={"data-marker": "item"})
 
                 # переходим в обработчик новых объявлений
                 ads_new = parser.find_new_ads(new_ad=ads, mode=mode)
 
                 # записываем изменения в базу данных
-                CURSOR.executemany(f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new)
+                CURSOR.executemany(
+                    f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new
+                )
 
                 # Сохраняем изменения
                 CONN.commit()
                 if not cycle:
                     eel.print(
-                        f"--Page: {page} Time spent: {round(tm() - start_time,4)} sec. Ads count: {len(ads)}",
+                        f"--Page: {page} Time spent: {round(tm() - start_time, 4)} sec. Ads count: {len(ads)}",
                         parser.title,
                     )
                     break
 
                 print(f"====={parser.title}=====")
-                print(f"Time spent: {round(tm() - start_time,3)} sec", parser.title)
-                print(f"Ads found: {len(ads)} ads", parser.title)
+                print(f"Time spent: {round(tm() - start_time, 3)} sec")
+                print(f"Ads found: {len(ads)} ads")
 
             await asyncio.sleep(parser.time * 60.0)
 
@@ -94,25 +97,28 @@ async def wait_new_parser():
                 new = Avito_parser(*resp)
 
                 # Вставляем данные парсера в таблицу
-                CURSOR.execute(f"""INSERT INTO 'parsers'
+                CURSOR.execute(
+                    f"""INSERT INTO 'parsers'
                                   VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}')"""
-                               )
+                )
 
                 # Сохраняем изменения
                 CONN.commit()
 
                 # создаём таблицу для парсера
-                CURSOR.execute(f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price')""")
-                ACTIVE_PARSERS.append(new)
+                CURSOR.execute(
+                    f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price')"""
+                )
+                ACTIVE_PARSERS[new.title] = new
 
                 eel.all_is_none()
-                eel.print(f"Parser was created for {round(tm() - start_time,4)}")
+                eel.print(f"Parser was created for {round(tm() - start_time, 4)}")
                 asyncio.create_task(parser_work(parser=new))
         await asyncio.sleep(1)
 
 
+# включает парсер и одновляет таблицу бд
 async def parser_work(parser):
-
     # считываем уже имеющиеся объявления
     CURSOR.execute(f"""SELECT url from {parser.title}""")
     ads = CURSOR.fetchall()
@@ -135,7 +141,7 @@ async def parser_work(parser):
     await asyncio.gather(*futures)
 
 
-def parser_stop(parser_id: Avito_parser):
-    parser = ACTIVE_PARSERS[parser_id]
+# остановка парсера
+def parser_stop(parser_name: str):
+    parser = ACTIVE_PARSERS[parser_name]
     parser.status = "not active"
-    parser.write_parser(mode=True)

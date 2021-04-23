@@ -55,6 +55,8 @@
         function vk_auth_js(){
             email = document.getElementById('Email').value;
             pass = document.getElementById('Password').value;
+            print(email, 'xbox');
+            print(pass, 'xbox');
             if (!auth_proc){
                 if ((email != "") && (pass != "")){
                     eel.vk_auth();
@@ -179,5 +181,8 @@
         <div class="information" id="books">
 
         </div>
-    </div>
+        <dir class="information" id="xbox">
+
+        </dir>
+     </div>
 </body>

@@ -195,7 +195,7 @@ class VKAuth(object):
 
     def _log_in(self):
         ep = eel.vk_auth_get_ep()()
-
+        print(ep)
         self.email = ep[0]
         self.password = ep[1]
 

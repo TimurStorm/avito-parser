@@ -1,14 +1,10 @@
-import random
 import eel
-from app.settings import VK
 
+from mailing import send_message
 
-def send_message(text):
-    VK.messages.send(
-        user_id=443194153,
-        message=text,
-        random_id=random.randint(-2147483648, +2147483647),
-    )
+"""
+Файл для объявления моделей
+"""
 
 
 class Avito_parser:
@@ -21,7 +17,7 @@ class Avito_parser:
         self.time = int(it)  # время итерации в минутах
 
     def __str__(self):
-        return "Парсер " + self.title
+        return self.title
 
     # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
     def find_new_ads(
@@ -39,8 +35,16 @@ class Avito_parser:
             title_link = info.find("a", attrs={"data-marker": "item-title"})
             title = title_link.find("h3").get_text()
             link = "https://www.avito.ru" + title_link.get("href")
-            price = info.find("span", attrs={"data-marker": "item-price"})\
-                .find('span', attrs={"class": "price-text-1HrJ_ text-text-1PdBw text-size-s-1PUdo"}).get_text()
+            price = (
+                info.find("span", attrs={"data-marker": "item-price"})
+                .find(
+                    "span",
+                    attrs={
+                        "class": "price-text-1HrJ_ text-text-1PdBw text-size-s-1PUdo"
+                    },
+                )
+                .get_text()
+            )
 
             # для удобства создаём новый объект класса Ad
             new = Ad(title, link, price)
@@ -54,9 +58,7 @@ class Avito_parser:
 
                 if mode:
                     # присылает уведомление в ВК
-                    send_message(
-                        text="Новое объявление!" + "\n" + title + "\n" + link
-                    )
+                    send_message(text="Новое объявление!" + "\n" + title + "\n" + link)
 
                     # выводит уведомление в приложении
                     eel.print(
