@@ -70,7 +70,6 @@ if not os.path.exists("../data/private.pem") or not os.path.exists("../db/public
     create_private_public_key()
     CURSOR.execute("""SELECT title from settings""")
     s = CURSOR.fetchall()
-    print(s)
     titles = [key for key in s if "token" in key]
     for title in titles:
         tokens = (None, title)
