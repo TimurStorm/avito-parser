@@ -12,13 +12,9 @@ from auth.vk import VKAuth
 Файл для сборки
 """
 
-settings.CURSOR.execute(
-    """CREATE TABLE IF NOT EXISTS parsers (name, url , timer, count, status)"""
-)
-
 settings.CURSOR.execute("""SELECT * from parsers""")
 parsers = settings.CURSOR.fetchall()
-
+# , mailing, creation_date, update_date)
 for parser in parsers:
     parser = list(parser)
     if parser[4] == "active":
@@ -41,7 +37,9 @@ def vk_auth():
     Реадизовать методы на получение пароля, почты и одноразового кода "000168154Tim" "noobofmylive@gmail.com"
     """
     ep = eel.vk_auth_get_ep()()
-    session = VKAuth(["friends"], settings.API_ID, "11.9.1", pswd=ep[1], email=ep[0])
+    session = VKAuth(
+        ["friends", "offline"], settings.API_ID, "11.9.1", pswd=ep[1], email=ep[0]
+    )
     session.auth()
 
     access_token = session.get_token()

@@ -1,8 +1,6 @@
 from datetime import datetime
-from app.models import *
 import eel
 import aiohttp
-from random import randint
 from bs4 import BeautifulSoup
 from time import time as tm
 from app.models import Avito_parser
@@ -35,7 +33,6 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
             eel.print(f"Start work of {parser.title} parser", parser.title)
             url = parser.url
         while parser.status == "active":
-
             async with session.get(url) as response:
                 start_time = tm()
                 page_info = await response.text()
@@ -67,7 +64,10 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
                 CURSOR.executemany(
                     f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new
                 )
-
+                info = (datetime.now().strftime("%d %B %H:%M:%S"), parser.title)
+                sql = f"""UPDATE parsers SET update_date = ? WHERE name = ?"""
+                CURSOR.execute(sql, info)
+                CONN.commit()
                 # Сохраняем изменения
                 CONN.commit()
                 if not cycle:
@@ -94,12 +94,15 @@ async def wait_new_parser():
                 start_time = tm()
                 eel.print("Create new parser")
                 # создание объекта парсера
-                new = Avito_parser(*resp)
+                new = Avito_parser(
+                    *resp, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
+                )
 
                 # Вставляем данные парсера в таблицу
                 CURSOR.execute(
                     f"""INSERT INTO 'parsers'
-                                  VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}')"""
+                                  VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
+                                  '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
                 )
 
                 # Сохраняем изменения

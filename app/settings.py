@@ -11,6 +11,7 @@ from pathlib import Path
 
 DIR_PATH = str(Path(os.getcwd()).parent)
 
+
 def settings_not_exist(CURSOR):
     CURSOR.execute("""SELECT * from settings""")
     s = CURSOR.fetchall()
@@ -27,9 +28,7 @@ def get_private_key():
 
 
 def get_public_key():
-    key = rsa.PublicKey(1, 2).load_pkcs1(
-        open("../db/public.pem", "rb").read()
-    )
+    key = rsa.PublicKey(1, 2).load_pkcs1(open("../db/public.pem", "rb").read())
     return key
 
 
@@ -62,6 +61,10 @@ if settings_not_exist(CURSOR):
     CURSOR.executemany(sqlite_insert_query, default)
     CONN.commit()
 
+CURSOR.execute(
+    """CREATE TABLE IF NOT EXISTS parsers (name, url , timer, count, status, mailing, creation_date, update_date)"""
+)
+'''
 # если нет файлов с ключами , то содаёт их и обнуляет все токены
 if not os.path.exists("../db/private.pem") or not os.path.exists("../db/public.pem"):
     create_private_public_key()
@@ -73,7 +76,7 @@ if not os.path.exists("../db/private.pem") or not os.path.exists("../db/public.p
         sql_update_query = f"""UPDATE settings SET value = ? WHERE title = ?"""
         CURSOR.execute(sql_update_query, tokens)
     CONN.commit()
-
+'''
 
 CURSOR.execute("""SELECT * from settings""")
 settings = dict(CURSOR.fetchall())
@@ -85,9 +88,14 @@ PUBLIC = get_public_key()
 
 API_ID = settings["api_id"]
 
-VK_TOKEN = rsa.decrypt(settings["vk_token"], PRIVATE).decode("utf-8")
+try:
+    VK_TOKEN = rsa.decrypt(settings["vk_token"], PRIVATE).decode("utf-8")
+    VK_SESSION = set_vk_session(VK_TOKEN)
+except Exception:
+    VK_SESSION = None
+    VK_TOKEN = None
+    print('Не валидный токен')
 
-VK_SESSION = set_vk_session(VK_TOKEN)
 
 ACTIVE_PARSERS = {}
 TASKS = []
