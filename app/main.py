@@ -1,92 +1,64 @@
 import eel
-import csv
-from time import time as tm
-from app.settings import WIND_SIZE, DIR_PATH
+import rsa
+import vk_api
+
+import settings
+import asyncio
 from app.models import Avito_parser
+from app.methods import wait_new_parser, parser_work
+from auth.vk import VKAuth
 
+"""
+Файл для сборки
+"""
 
-def close_app():
-    #start = tm()
-    if active_parsers:
-        for parser in active_parsers:
-            if parser.ex == "active":
-                set_thread(parser.id)
-    #print(f'Time for start {tm()-start}')
-    #print("##########All parser is working!##########")
+settings.CURSOR.execute("""SELECT * from parsers""")
+parsers = settings.CURSOR.fetchall()
+# , mailing, creation_date, update_date)
+for parser in parsers:
+    parser = list(parser)
+    if parser[4] == "active":
+        new = Avito_parser(*parser)
+        settings.ACTIVE_PARSERS[parser[0]] = new
+        settings.TASKS.append(parser_work(parser=new))
 
-
-active_parsers = []
-with open(DIR_PATH + "\\csv\\parsers.csv", "r", encoding="utf-8") as file:
-    reader = csv.reader(file, delimiter=",")
-    for row in reader:
-        if row != []:
-            active_parsers.append(Avito_parser(*row))
-print(DIR_PATH + "\\templates")
-eel.init(DIR_PATH + "\\templates")
-
-
-@eel.expose
-def get_parser(pk):
-    if active_parsers:
-        if active_parsers[pk].ex == "active":
-            return True
-        else:
-            return False
+settings.TASKS.append(wait_new_parser())
+eel.init(settings.DIR_PATH + "\\templates")
 
 
 @eel.expose
-def set_ex(pk):
-    pars = active_parsers[pk]
-    eel.print("End of thread work: " + pars.title)
-    pars.ex = "not active"
+def loop():
+    settings.MAIN_LOOP.run_until_complete(asyncio.gather(*settings.TASKS))
 
 
 @eel.expose
-def set_thread(pk):
-    pars = active_parsers[pk]
-    eel.print("Beginning of thread work: " + pars.title)
-    pars.ex = "active"
+def vk_auth():
+    """
+    Реадизовать методы на получение пароля, почты и одноразового кода "000168154Tim" "noobofmylive@gmail.com"
+    """
+    ep = eel.vk_auth_get_ep()()
+    session = VKAuth(
+        ["friends", "offline"], settings.API_ID, "11.9.1", pswd=ep[1], email=ep[0]
+    )
+    session.auth()
 
-    def my_thread():
-        while pars.ex != "not active":
-            pars.find_new_ads()
-            eel.sleep(pars.time * 60.0)
+    access_token = session.get_token()
+    eel.vk_auth_set_ep_null()
 
-    eel.spawn(my_thread)
+    settings.VK_TOKEN = access_token
+    settings.VK_SESSION = settings.set_vk_session(settings.VK_TOKEN)
 
+    info = (rsa.encrypt(access_token.encode("utf8"), settings.PUBLIC), "vk_token")
+    sql = f"""UPDATE settings SET value = ? WHERE title = ?"""
+    settings.CURSOR.execute(sql, info)
+    settings.CONN.commit()
 
-@eel.expose
-def create_parser(title, url, time):
-    try:
-        start = tm()
-        new = Avito_parser(
-            title=title, url=url, it=time, pk=len(active_parsers), status="active"
-        )  # создает парсер
-        active_parsers.append(new)  # добавляет объект в массив активных парсеров
-        new.write_parser()  # записывает параметры парсера в файл
-        new.create_ads_file()  # создает файл для хранения
-        set_thread(len(active_parsers) - 1)  # запускает парсер
-        print(f"Parser was created {float(tm())-start}")
-    except Exception as e:
-        print(f"Ошибка:{e}")
-
-
-@eel.expose
-def delete_parser(parsers: list, pk: int):
-    set_ex(pk=pk)
-    parsers.pop(pk)
-    with open("../csv/parsers.csv", "w", encoding="utf-8") as file:
-        writer = csv.writer(file, delimiter=",")
-        for pars in parsers:
-            writer.writerow(pars.title, pars.url, pars.time)
-
-
-@eel.expose
-def get_parsers():
-    for parser in active_parsers:
-        eel.print(parser.title + " " + parser.ex)
+    session = vk_api.VkApi(token=access_token)
+    VK = session.get_api()
+    info = VK.account.getProfileInfo()
+    eel.print(f"{info}", "xbox")
 
 
 # close_callback - функция для закрытия приложения
-eel.start("test.html", size=WIND_SIZE, close_callback=close_app())
+eel.start("test.html", size=settings.WIND_SIZE, port=5000)
 # вставить сюда все то , что нужно вывести, главный поток

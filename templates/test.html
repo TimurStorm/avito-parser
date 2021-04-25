@@ -6,38 +6,84 @@
     <script type="text/javascript" src="/eel.js"></script>
     <title>Title</title>
     <script>
-        var act = eel.get_parser(0);
-        eel.expose(print);
-        function print(x){
-            var elem = document.getElementById("information");
+        eel.loop();
+        var title = "";
+        var page = "";
+        var url = "";
+        var time = "";
+        var email = "";
+        var pass = "";
+        var sec_code = "";
+        var auth_proc = false;
+        function print(x, place){
+            var elem = document.getElementById(place);
             var resp = "\n<br>" + x;
             elem.innerHTML += resp;
         }
-        function start(){
-            if (act == false){
-                act = true;
-                eel.set_thread(pk=0);
+        eel.expose(print);
+        function wait_new_parser_js(){
+            if((title != "") && (url != "") && (time != "") && (page != "")){
+                return [ title, url, time, page];
             }
-            else{
-                act = false;
-                eel.set_ex(pk=0);
-            }
+            return false;
         }
-        function get(){
-            eel.get_parsers();
-        }
+        eel.expose(wait_new_parser_js);
         function create_parser_js(){
+            title = document.getElementById('Title').value;
+            url = document.getElementById('Url').value;
+            time = document.getElementById('Time').value;
+            page = document.getElementById('Page').value;
+        }
+        eel.expose(all_is_none)
+        function all_is_none(){
+            title = "";
+            url = "";
+            time = "";
+            page = "";
+        }
+        function vk(){
+            eel.vk_auth();
+        }
+        function test_auth(){
+            print(1);
+            eel.set_security_code();
+        }
+        eel.expose(vk_auth_get_ep);
+        function vk_auth_get_ep(){
+            return [email, pass];
+        }
+        function vk_auth_js(){
+            email = document.getElementById('Email').value;
+            pass = document.getElementById('Password').value;
+            print(email, 'xbox');
+            print(pass, 'xbox');
+            if (!auth_proc){
+                if ((email != "") && (pass != "")){
+                    eel.vk_auth();
+                    auth_proc = true;
+                    }
+                }
+        }
+        eel.expose(vk_auth_set_ep_null);
+        function vk_auth_set_ep_null(){
+            email = "";
+            pass = "";
+        }
+        eel.expose(get_security_code);
+        function get_security_code(){
+            if (sec_code != ""){
+                return sec_code;
+            }
+            return;
+        }
 
-            let form = document.forms.new_parser; // <form name="my"> element
-
-            // получаем элемент
-            let title = form.elements.Title.value; // <input name="one"> element
-            let url = form.elements.Url.value;
-            let time = form.elements.Time.value;
-            eel.create_parser(title,url,time);
+        function set_code(){
+            sec_code = document.getElementById('Code').value;
+            print(sec_code,"xbox");
         }
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap">
     <link rel="stylesheet" href="Main.css">
     <style>
@@ -56,10 +102,17 @@
             height: 100%;
             text-align: center;
         }
-        #information{
-            font-family: 'Nunito', sans-serif;
-            min-height: 200px;
-            min-width: 300px;
+        .information{
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Fira Code', monospace;
+            color: white;
+            background: black;
+            height: 400px;
+            width: 40%;
+            float: left;
+            padding-right:20px;
+            overflow: auto;
         }
         #menu_title{
             padding: 10px;
@@ -98,18 +151,38 @@
         <div>
             <button onclick="start()">Старт</button>
             <button onclick="get()">Получить парсеры</button>
+            <button onclick="vk()">ВК</button>
+            <button onclick="test_auth()">Тест</button>
         </div>
         <div>
-            <form name="new_parser">
+            <div id="new_parser">
                 <p><b>Форма создания парсера</b></p>
-                <p><input type="text" name="Title">Название<Br>
-                <input type="text" name="Url">Ссылка<Br>
-                <input type="text" name="Time">Время итерации</p>
+                <p><input id="Title" type="text" name="Title">Название<Br>
+                <input id="Url" type="text" name="Url">Ссылка<Br>
+                    <input id="Page" type="text" name="Page">Количество страниц для анализа<Br>
+                <input id="Time" type="text" name="Time">Время итерации</p>
                 <p><input type="submit" onclick="create_parser_js()"></p>
-            </form>
+            </div>
+            <div id="new_vk">
+                <p><b>Форма авторизации</b></p>
+                <p><input id="Email" type="text" name="Email">Почта<Br>
+                <input id="Password" type="text" name="Password">Пароль<Br></p>
+                <p><input type="submit" onclick="vk_auth_js()"></p>
+            </div>
+            <div id="ode">
+                <p><b>Форма кода</b></p>
+                <p><input id="Code" type="text" name="Code">Код<Br></p>
+                <p><input type="submit" onclick="set_code()"></p>
+            </div>
         </div>
-        <div id="information">
+        <div class="information" id="MacBook">
 
         </div>
-    </div>
+        <div class="information" id="books">
+
+        </div>
+        <dir class="information" id="xbox">
+
+        </dir>
+     </div>
 </body>
