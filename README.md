@@ -13,5 +13,4 @@ pip install poetry
 ```bash 
 poetry install
 ```
-#### 5) Создать папку csv, а в ней parsers.csv .
 #### 6) Готово!
