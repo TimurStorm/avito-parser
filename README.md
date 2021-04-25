@@ -13,4 +13,4 @@ pip install poetry
 ```bash 
 poetry install
 ```
-#### 6) Готово!
+#### 5) Готово!
