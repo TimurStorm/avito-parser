@@ -1,7 +1,5 @@
 import eel
 
-from mailing import send_message
-
 """
 Файл для объявления моделей
 """
@@ -75,9 +73,7 @@ class Avito_parser:
                 if mode:
                     # присылает уведомление в ВК
                     if self.mailing == "Vk":
-                        send_message(
-                            text="Новое объявление!" + "\n" + title + "\n" + link
-                        )
+                        pass
 
                     # выводит уведомление в приложении
                     eel.print(

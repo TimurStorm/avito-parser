@@ -43,10 +43,10 @@ def create_private_public_key():
     with open("../data/public.pem", mode="wb") as file:
         file.write(public.save_pkcs1("PEM"))
 
-
+"""
 def set_vk_session(token):
     session = vk_api.VkApi(token=token)
-    return session.get_api()
+    return session.get_api()"""
 
 
 CONN = sqlite3.connect("../data/database.db")
@@ -70,7 +70,6 @@ if not os.path.exists("../data/private.pem") or not os.path.exists("../db/public
     create_private_public_key()
     CURSOR.execute("""SELECT title from settings""")
     s = CURSOR.fetchall()
-    print(s)
     titles = [key for key in s if "token" in key]
     for title in titles:
         tokens = (None, title)
@@ -88,14 +87,16 @@ PRIVATE = get_private_key()
 PUBLIC = get_public_key()
 
 API_ID = settings["api_id"]
-
+'''
 try:
-    VK_TOKEN = rsa.decrypt(settings["vk_token"], PRIVATE).decode("utf-8")
+    #VK_TOKEN = rsa.decrypt(settings["vk_token"], PRIVATE).decode("utf-8")
+    VK_TOKEN = "165a143791d5431d7b9a3e628b7baaaa7fcaaac794da2bd3ed97c9e1f0c64e6a65bed9508541ea8a3a2c5"
     VK_SESSION = set_vk_session(VK_TOKEN)
 except Exception:
     VK_SESSION = None
     VK_TOKEN = None
-    print('Не валидный токен')
+    print("Не валидный токен")
+    '''
 
 
 ACTIVE_PARSERS = {}

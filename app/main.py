@@ -11,7 +11,6 @@ from auth.vk import VKAuth
 """
 Файл для сборки
 """
-
 settings.CURSOR.execute("""SELECT * from parsers""")
 parsers = settings.CURSOR.fetchall()
 # , mailing, creation_date, update_date)
@@ -33,12 +32,9 @@ def loop():
 
 @eel.expose
 def vk_auth():
-    """
-    Реадизовать методы на получение пароля, почты и одноразового кода "000168154Tim" "noobofmylive@gmail.com"
-    """
     ep = eel.vk_auth_get_ep()()
     session = VKAuth(
-        ["friends", "offline"], settings.API_ID, "11.9.1", pswd=ep[1], email=ep[0]
+        ["messages"], settings.API_ID, "11.9.1", pswd=ep[1], email=ep[0]
     )
     session.auth()
 
@@ -46,6 +42,7 @@ def vk_auth():
     eel.vk_auth_set_ep_null()
 
     settings.VK_TOKEN = access_token
+    print(access_token)
     settings.VK_SESSION = settings.set_vk_session(settings.VK_TOKEN)
 
     info = (rsa.encrypt(access_token.encode("utf8"), settings.PUBLIC), "vk_token")
