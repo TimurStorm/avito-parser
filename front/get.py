@@ -1,5 +1,5 @@
 import eel
-from settings import ACTIVE_PARSERS
+from app.settings import ACTIVE_PARSERS, CURSOR
 
 """
 Файл для вывода информациии на фронт
@@ -28,4 +28,6 @@ def get_all_parsers():
 
 @eel.expose
 def get_all_settings():
-    pass
+    CURSOR.execute("""SELECT * from settings""")
+    settings = dict(CURSOR.fetchall())
+    return settings

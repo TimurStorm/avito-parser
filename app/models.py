@@ -1,4 +1,5 @@
 import eel
+import requests
 
 """
 Файл для объявления моделей
@@ -34,7 +35,7 @@ class Avito_parser:
         return self.title
 
     # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
-    def find_new_ads(
+    async def find_new_ads(
         self,
         mode=True,
         new_ad=None,
@@ -71,13 +72,13 @@ class Avito_parser:
                 self.ads.append(new.url)
 
                 if mode:
+                    text = "----------New Ad!" + "\n" + title + "\n" + link
                     # присылает уведомление в ВК
-                    if self.mailing == "Vk":
-                        pass
+                    requests.post(f'http://localhost:80/vk/send/?id=443194153&tx={text}')
 
                     # выводит уведомление в приложении
                     eel.print(
-                        "----------New Ad!" + "\n" + title + "\n" + link, self.title
+                        text, self.title
                     )
 
         return ads_new

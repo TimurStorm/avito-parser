@@ -58,7 +58,7 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
                 ads = all_ads.find_all("div", attrs={"data-marker": "item"})
 
                 # переходим в обработчик новых объявлений
-                ads_new = parser.find_new_ads(new_ad=ads, mode=mode)
+                ads_new = await parser.find_new_ads(new_ad=ads, mode=mode)
 
                 # записываем изменения в базу данных
                 CURSOR.executemany(
