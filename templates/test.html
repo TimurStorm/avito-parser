@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="Main.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
     <title>Title</title>
     <script>
@@ -15,6 +15,7 @@
         var pass = "";
         var sec_code = "";
         var auth_proc = false;
+        var resp;
         function print(x, place){
             var elem = document.getElementById(place);
             var resp = "\n<br>" + x;
@@ -28,58 +29,31 @@
             return false;
         }
         eel.expose(wait_new_parser_js);
-        function create_parser_js(){
+        async function create_parser_js(){
+            console.log(1);
             title = document.getElementById('Title').value;
             url = document.getElementById('Url').value;
             time = document.getElementById('Time').value;
             page = document.getElementById('Page').value;
-        }
-        eel.expose(all_is_none)
-        function all_is_none(){
-            title = "";
-            url = "";
-            time = "";
-            page = "";
-        }
-        function vk(){
-            eel.vk_auth();
-        }
-        function test_auth(){
-            print(1);
-            eel.set_security_code();
-        }
-        eel.expose(vk_auth_get_ep);
-        function vk_auth_get_ep(){
-            return [email, pass];
-        }
-        function vk_auth_js(){
-            email = document.getElementById('Email').value;
-            pass = document.getElementById('Password').value;
-            print(email, 'xbox');
-            print(pass, 'xbox');
-            if (!auth_proc){
-                if ((email != "") && (pass != "")){
-                    eel.vk_auth();
-                    auth_proc = true;
-                    }
-                }
-        }
-        eel.expose(vk_auth_set_ep_null);
-        function vk_auth_set_ep_null(){
-            email = "";
-            pass = "";
-        }
-        eel.expose(get_security_code);
-        function get_security_code(){
-            if (sec_code != ""){
-                return sec_code;
+            resp = await eel.create_parser(title, url, time, page)();
+            console.log(resp);
+            if (resp["type"] == "Error"){
+                console.log(2);
+                swal("Ошибка!", resp["msg"], "error");
             }
-            return;
+            else if (resp["type"] == "Success"){
+                swal("Успешно!", "Парсер успешно создан", "success");
+            }
         }
-
-        function set_code(){
-            sec_code = document.getElementById('Code').value;
-            print(sec_code,"xbox");
+        async function auth(){
+            email = document.getElementById('Email').value;
+            password = document.getElementById('Password').value;
+            resp = await eel.login(email, password)();
+            console.log(resp);
+            console.log("user" in resp);
+            if ("user" in resp){
+                print("Вы авторизовались как "+resp["user"]["username"],"xbox");
+            }
         }
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -149,12 +123,6 @@
             <a>Информация:</a>
         </div>
         <div>
-            <button onclick="start()">Старт</button>
-            <button onclick="get()">Получить парсеры</button>
-            <button onclick="vk()">ВК</button>
-            <button onclick="test_auth()">Тест</button>
-        </div>
-        <div>
             <div id="new_parser">
                 <p><b>Форма создания парсера</b></p>
                 <p><input id="Title" type="text" name="Title">Название<Br>
@@ -167,7 +135,7 @@
                 <p><b>Форма авторизации</b></p>
                 <p><input id="Email" type="text" name="Email">Почта<Br>
                 <input id="Password" type="text" name="Password">Пароль<Br></p>
-                <p><input type="submit" onclick="vk_auth_js()"></p>
+                <p><input type="submit" onclick="auth()"></p>
             </div>
             <div id="ode">
                 <p><b>Форма кода</b></p>
@@ -178,11 +146,14 @@
         <div class="information" id="MacBook">
 
         </div>
-        <div class="information" id="books">
-
-        </div>
         <dir class="information" id="xbox">
 
         </dir>
+        <dir class="information" id="svin">
+
+        </dir>
+        <div class="information" id="pen">
+
+        </div>
      </div>
 </body>

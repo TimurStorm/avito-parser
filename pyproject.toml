@@ -18,6 +18,7 @@ rsa = "^4.7.2"
 aiohttp = "^3.7.4"
 asyncio = "^3.4.3"
 bcrypt = "^3.2.0"
+keyring = "^23.0.1"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,8 +1,10 @@
-from datetime import datetime
 import eel
 import aiohttp
+
 from bs4 import BeautifulSoup
+from datetime import datetime
 from time import time as tm
+
 from app.models import Avito_parser
 from app.settings import *
 
@@ -41,7 +43,8 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
                 if cycle:
                     if resp == "200":
                         eel.print(
-                            f"{datetime.now().strftime('%d %B %H:%M:%S')} parser {parser.title} Status code {resp}: Everything is okay",
+                            f"{datetime.now().strftime('%d %B %H:%M:%S')} parser {parser.title} Status code {resp}: "
+                            f"Everything is okay",
                             parser.title,
                         )
                     else:
@@ -62,7 +65,7 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
 
                 # записываем изменения в базу данных
                 CURSOR.executemany(
-                    f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new
+                    f"INSERT INTO '{parser.title}' VALUES (?,?,?,?)", ads_new
                 )
                 info = (datetime.now().strftime("%d %B %H:%M:%S"), parser.title)
                 sql = f"""UPDATE parsers SET update_date = ? WHERE name = ?"""
@@ -84,40 +87,38 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
             await asyncio.sleep(parser.time * 60.0)
 
 
-# ожидает создание нового парсера
-async def wait_new_parser():
-    while True:
-        resp = eel.wait_new_parser_js()()
-        if type(resp) is list:
-            print()
-            if resp[2].isdigit and resp[3].isdigit:
-                start_time = tm()
-                eel.print("Create new parser")
-                # создание объекта парсера
-                new = Avito_parser(
-                    *resp, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
-                )
+@eel.expose
+def create_parser(title, url, time, count):
+    try:
+        CURSOR.execute("""SELECT name from parsers""")
+        parsers = CURSOR.fetchall()
+        if title in parsers:
+            return {"type": "Error", "msg": "Парсер с таким названием уже существует."}
+        # создание объекта парсера
+        new = Avito_parser(
+            title=title, url=url, count=count, it=time, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
+        )
 
-                # Вставляем данные парсера в таблицу
-                CURSOR.execute(
-                    f"""INSERT INTO 'parsers'
-                                  VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
-                                  '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
-                )
+        # Вставляем данные парсера в таблицу
+        CURSOR.execute(
+            f"""INSERT INTO 'parsers' VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
+            '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
+        )
 
-                # Сохраняем изменения
-                CONN.commit()
+        # Сохраняем изменения
+        CONN.commit()
 
-                # создаём таблицу для парсера
-                CURSOR.execute(
-                    f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price')"""
-                )
-                ACTIVE_PARSERS[new.title] = new
+        # создаём таблицу для парсера
+        CURSOR.execute(
+            f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price', 'see')"""
+        )
+        ACTIVE_PARSERS[new.title] = new
 
-                eel.all_is_none()
-                eel.print(f"Parser was created for {round(tm() - start_time, 4)}")
-                asyncio.create_task(parser_work(parser=new))
-        await asyncio.sleep(1)
+        MAIN_LOOP.run_until_complete(parser_work(parser=new))
+        return {"type": "Success", "msg": "Парсер удачно создан."}
+    except Exception as e:
+        print(e)
+        return {"type": "Error", "msg": e}
 
 
 # включает парсер и одновляет таблицу бд

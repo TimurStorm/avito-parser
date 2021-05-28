@@ -1,5 +1,5 @@
 import eel
-from app.settings import ACTIVE_PARSERS, CURSOR
+from app.settings import CURSOR
 
 """
 Файл для вывода информациии на фронт
@@ -7,23 +7,17 @@ from app.settings import ACTIVE_PARSERS, CURSOR
 
 
 @eel.expose
-def get_parser_info(parser_title: str):
-    parser = ACTIVE_PARSERS[parser_title]
-    return vars(parser)
-
-
-@eel.expose
-def get_parser_ads(parser_title: str):
-    parser = ACTIVE_PARSERS[parser_title]
-    info = {}
-    for ad in parser.ads:
-        info[ad.title] = vars(ad)
+def get_parser_ads(parser_name: str):
+    CURSOR.execute(f"""SELECT * from '{parser_name}'""")
+    info = dict(CURSOR.fetchall())
     return info
 
 
 @eel.expose
 def get_all_parsers():
-    return ACTIVE_PARSERS
+    CURSOR.execute(f"""SELECT * from parsers""")
+    info = dict(CURSOR.fetchall())
+    return info
 
 
 @eel.expose

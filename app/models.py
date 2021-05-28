@@ -6,20 +6,17 @@ import requests
 """
 
 
-# , mailing, creation_date, update_date)
-
-
 class Avito_parser:
     def __init__(
-        self,
-        title,
-        url,
-        it,
-        count,
-        status="active",
-        mailing=None,
-        creation_date=None,
-        update_date=None,
+            self,
+            title,
+            url,
+            it,
+            count,
+            status="active",
+            mailing=None,
+            creation_date=None,
+            update_date=None,
     ):
         self.update_date = update_date  # дата последнего обновления
         self.creation_date = creation_date  # дата создания
@@ -36,9 +33,9 @@ class Avito_parser:
 
     # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
     async def find_new_ads(
-        self,
-        mode=True,
-        new_ad=None,
+            self,
+            mode=True,
+            new_ad=None,
     ):
 
         ads_url = self.ads
@@ -52,13 +49,13 @@ class Avito_parser:
             link = "https://www.avito.ru" + title_link.get("href")
             price = (
                 info.find("span", attrs={"data-marker": "item-price"})
-                .find(
+                    .find(
                     "span",
                     attrs={
                         "class": "price-text-1HrJ_ text-text-1PdBw text-size-s-1PUdo"
                     },
                 )
-                .get_text()
+                    .get_text()
             )
 
             # для удобства создаём новый объект класса Ad
@@ -68,13 +65,13 @@ class Avito_parser:
             if new.url not in ads_url:
 
                 # добавляем новое объявление в список для бд и будующей проверки
-                ads_new.append((new.title, new.url, new.price))
+                ads_new.append((new.title, new.url, new.price, False))
                 self.ads.append(new.url)
 
                 if mode:
                     text = "----------New Ad!" + "\n" + title + "\n" + link
                     # присылает уведомление в ВК
-                    requests.post(f'http://localhost:80/vk/send/?id=443194153&tx={text}')
+                    requests.post(f'http://localhost:70/send/?pk=443194153&text={text}')
 
                     # выводит уведомление в приложении
                     eel.print(
@@ -92,3 +89,10 @@ class Ad:
 
     def __str__(self):
         return f"Объявление: {self.title} по цене {self.price}"
+
+
+class User:
+    def __init__(self, username, vk_id, email):
+        self.username = username
+        self.email = email
+        self.vk_id = vk_id
