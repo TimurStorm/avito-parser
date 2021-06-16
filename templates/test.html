@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="Main.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
     <title>Title</title>
     <script>
@@ -14,72 +14,52 @@
         var email = "";
         var pass = "";
         var sec_code = "";
-        var auth_proc = false;
+        var signal = true;
+        var resp;
+        function signall(){
+            return signal;
+        }
+        eel.expose(signall);
         function print(x, place){
             var elem = document.getElementById(place);
             var resp = "\n<br>" + x;
             elem.innerHTML += resp;
         }
         eel.expose(print);
-        function wait_new_parser_js(){
-            if((title != "") && (url != "") && (time != "") && (page != "")){
-                return [ title, url, time, page];
-            }
-            return false;
-        }
-        eel.expose(wait_new_parser_js);
-        function create_parser_js(){
+        function get_new_parser(){
+
             title = document.getElementById('Title').value;
             url = document.getElementById('Url').value;
             time = document.getElementById('Time').value;
             page = document.getElementById('Page').value;
-        }
-        eel.expose(all_is_none)
-        function all_is_none(){
-            title = "";
-            url = "";
-            time = "";
-            page = "";
-        }
-        function vk(){
-            eel.vk_auth();
-        }
-        function test_auth(){
-            print(1);
-            eel.set_security_code();
-        }
-        eel.expose(vk_auth_get_ep);
-        function vk_auth_get_ep(){
-            return [email, pass];
-        }
-        function vk_auth_js(){
-            email = document.getElementById('Email').value;
-            pass = document.getElementById('Password').value;
-            print(email, 'xbox');
-            print(pass, 'xbox');
-            if (!auth_proc){
-                if ((email != "") && (pass != "")){
-                    eel.vk_auth();
-                    auth_proc = true;
-                    }
-                }
-        }
-        eel.expose(vk_auth_set_ep_null);
-        function vk_auth_set_ep_null(){
-            email = "";
-            pass = "";
-        }
-        eel.expose(get_security_code);
-        function get_security_code(){
-            if (sec_code != ""){
-                return sec_code;
-            }
-            return;
-        }
 
-        function set_code(){
-            sec_code = document.getElementById('Code').value;
-            print(sec_code,"xbox");
+            return [title, url, time, page];
+        }
+        function set_signal_false(){
+            signal = false;
+        }
+        function set_signal_true(){
+            signal = true;
+        }
+        eel.expose(set_signal_true);
+        eel.expose(get_new_parser);
+        function print_push(resp){
+
+            if (resp["type"] == "Error"){
+                swal("Ошибка!", resp["msg"], "error");
+            }
+            else if (resp["type"] == "Success"){
+                swal("Успешно!", resp["msg"], "success");
+            }
+        }
+        eel.expose(print_push);
+        async function auth(){
+            email = document.getElementById('Email').value;
+            password = document.getElementById('Password').value;
+            resp = await eel.login(email, password)();
+            if ("user" in resp){
+                print("Вы авторизовались как "+resp["user"]["username"],"xbox");
+            }
         }
     </script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -149,25 +129,19 @@
             <a>Информация:</a>
         </div>
         <div>
-            <button onclick="start()">Старт</button>
-            <button onclick="get()">Получить парсеры</button>
-            <button onclick="vk()">ВК</button>
-            <button onclick="test_auth()">Тест</button>
-        </div>
-        <div>
             <div id="new_parser">
                 <p><b>Форма создания парсера</b></p>
                 <p><input id="Title" type="text" name="Title">Название<Br>
                 <input id="Url" type="text" name="Url">Ссылка<Br>
                     <input id="Page" type="text" name="Page">Количество страниц для анализа<Br>
                 <input id="Time" type="text" name="Time">Время итерации</p>
-                <p><input type="submit" onclick="create_parser_js()"></p>
+                <p><input type="submit" onclick="set_signal_false()"></p>
             </div>
             <div id="new_vk">
                 <p><b>Форма авторизации</b></p>
                 <p><input id="Email" type="text" name="Email">Почта<Br>
                 <input id="Password" type="text" name="Password">Пароль<Br></p>
-                <p><input type="submit" onclick="vk_auth_js()"></p>
+                <p><input type="submit" onclick="auth()"></p>
             </div>
             <div id="ode">
                 <p><b>Форма кода</b></p>
@@ -178,11 +152,14 @@
         <div class="information" id="MacBook">
 
         </div>
-        <div class="information" id="books">
-
-        </div>
         <dir class="information" id="xbox">
 
         </dir>
+        <dir class="information" id="svin">
+
+        </dir>
+        <div class="information" id="pen">
+
+        </div>
      </div>
 </body>

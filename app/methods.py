@@ -1,8 +1,10 @@
-from datetime import datetime
 import eel
 import aiohttp
+
 from bs4 import BeautifulSoup
+from datetime import datetime
 from time import time as tm
+
 from app.models import Avito_parser
 from app.settings import *
 
@@ -41,7 +43,8 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
                 if cycle:
                     if resp == "200":
                         eel.print(
-                            f"{datetime.now().strftime('%d %B %H:%M:%S')} parser {parser.title} Status code {resp}: Everything is okay",
+                            f"{datetime.now().strftime('%d %B %H:%M:%S')} parser {parser.title} Status code {resp}: "
+                            f"Everything is okay",
                             parser.title,
                         )
                     else:
@@ -58,11 +61,11 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
                 ads = all_ads.find_all("div", attrs={"data-marker": "item"})
 
                 # переходим в обработчик новых объявлений
-                ads_new = parser.find_new_ads(new_ad=ads, mode=mode)
+                ads_new = await parser.find_new_ads(new_ad=ads, mode=mode)
 
                 # записываем изменения в базу данных
                 CURSOR.executemany(
-                    f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new
+                    f"INSERT INTO '{parser.title}' VALUES (?,?,?,?)", ads_new
                 )
                 info = (datetime.now().strftime("%d %B %H:%M:%S"), parser.title)
                 sql = f"""UPDATE parsers SET update_date = ? WHERE name = ?"""
@@ -84,45 +87,39 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
             await asyncio.sleep(parser.time * 60.0)
 
 
-# ожидает создание нового парсера
-async def wait_new_parser():
-    while True:
-        resp = eel.wait_new_parser_js()()
-        if type(resp) is list:
-            print()
-            if resp[2].isdigit and resp[3].isdigit:
-                start_time = tm()
-                eel.print("Create new parser")
-                # создание объекта парсера
-                new = Avito_parser(
-                    *resp, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
-                )
+async def create_parser(title, url, time, count):
+    try:
+        CURSOR.execute("""SELECT name from parsers""")
+        parsers = CURSOR.fetchall()
+        if title in parsers:
+            eel.print_push({"type": "Error", "msg": "Парсер с таким названием уже существует."})
+        # создание объекта парсера
+        new = Avito_parser(
+            title=title, url=url, count=count, it=time, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
+        )
+        # Вставляем данные парсера в таблицу
+        CURSOR.execute(
+            f"""INSERT INTO 'parsers' VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
+            '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
+        )
+        # Сохраняем изменения
+        CONN.commit()
+        # создаём таблицу для парсера
+        CURSOR.execute(
+            f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price', 'see')"""
+        )
+        ACTIVE_PARSERS[new.title] = new
+        eel.print_push({"type": "Success", "msg": "Парсер удачно создан."})
+        MAIN_LOOP.create_task(parser_work(parser=new))
 
-                # Вставляем данные парсера в таблицу
-                CURSOR.execute(
-                    f"""INSERT INTO 'parsers'
-                                  VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
-                                  '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
-                )
-
-                # Сохраняем изменения
-                CONN.commit()
-
-                # создаём таблицу для парсера
-                CURSOR.execute(
-                    f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price')"""
-                )
-                ACTIVE_PARSERS[new.title] = new
-
-                eel.all_is_none()
-                eel.print(f"Parser was created for {round(tm() - start_time, 4)}")
-                asyncio.create_task(parser_work(parser=new))
-        await asyncio.sleep(1)
+    except Exception as e:
+        eel.print_push({"type": "Error", "msg": e})
 
 
 # включает парсер и одновляет таблицу бд
 async def parser_work(parser):
     # считываем уже имеющиеся объявления
+
     CURSOR.execute(f"""SELECT url from {parser.title}""")
     ads = CURSOR.fetchall()
     for url in ads:
@@ -148,3 +145,14 @@ async def parser_work(parser):
 def parser_stop(parser_name: str):
     parser = ACTIVE_PARSERS[parser_name]
     parser.status = "not active"
+
+
+async def wait_parser():
+    while True:
+        signal = True
+        while signal:
+            await asyncio.sleep(1)
+            signal = eel.signall()()
+        re = eel.get_new_parser()()
+        MAIN_LOOP.create_task(create_parser(*re))
+        eel.set_signal_true()()

@@ -1,64 +1,58 @@
 import eel
-import rsa
-import vk_api
+from keyring import get_password
 
 import settings
 import asyncio
-from app.models import Avito_parser
-from app.methods import wait_new_parser, parser_work
-from auth.vk import VKAuth
+
+from app.models import Avito_parser, User
+from app.methods import parser_work, wait_parser
+from front.auth import login
 
 """
 Файл для сборки
 """
 
-settings.CURSOR.execute("""SELECT * from parsers""")
-parsers = settings.CURSOR.fetchall()
-# , mailing, creation_date, update_date)
-for parser in parsers:
-    parser = list(parser)
-    if parser[4] == "active":
-        new = Avito_parser(*parser)
-        settings.ACTIVE_PARSERS[parser[0]] = new
-        settings.TASKS.append(parser_work(parser=new))
 
-settings.TASKS.append(wait_new_parser())
-eel.init(settings.DIR_PATH + "\\templates")
+def set_auth():
+    pwd = get_password(service_name="Parser", username=f"{settings.USERNAME}_pwd")
+    ema = get_password(service_name="Parser", username=f"{settings.USERNAME}_ema")
 
-
-@eel.expose
-def loop():
-    settings.MAIN_LOOP.run_until_complete(asyncio.gather(*settings.TASKS))
+    if ema is not None and pwd is not None:
+        try:
+            resp = login(email=ema, password=pwd)
+            info = resp["user"]
+            USER = User(username=info["username"], email=info["email"], vk_id=info["vk_id"])
+            settings.USERNAME = USER.username
+        except Exception:
+            print("Ошибка авторизации")
 
 
-@eel.expose
-def vk_auth():
-    """
-    Реадизовать методы на получение пароля, почты и одноразового кода "000168154Tim" "noobofmylive@gmail.com"
-    """
-    ep = eel.vk_auth_get_ep()()
-    session = VKAuth(
-        ["friends", "offline"], settings.API_ID, "11.9.1", pswd=ep[1], email=ep[0]
-    )
-    session.auth()
-
-    access_token = session.get_token()
-    eel.vk_auth_set_ep_null()
-
-    settings.VK_TOKEN = access_token
-    settings.VK_SESSION = settings.set_vk_session(settings.VK_TOKEN)
-
-    info = (rsa.encrypt(access_token.encode("utf8"), settings.PUBLIC), "vk_token")
-    sql = f"""UPDATE settings SET value = ? WHERE title = ?"""
-    settings.CURSOR.execute(sql, info)
-    settings.CONN.commit()
-
-    session = vk_api.VkApi(token=access_token)
-    VK = session.get_api()
-    info = VK.account.getProfileInfo()
-    eel.print(f"{info}", "xbox")
+def set_parsers():
+    settings.CURSOR.execute("""SELECT * from parsers""")
+    parsers = settings.CURSOR.fetchall()
+    for parser in parsers:
+        parser = list(parser)
+        if parser[4] == "active":
+            new = Avito_parser(*parser)
+            settings.ACTIVE_PARSERS[parser[0]] = new
+            settings.TASKS.append(parser_work(parser=new))
 
 
-# close_callback - функция для закрытия приложения
-eel.start("test.html", size=settings.WIND_SIZE, port=5000)
-# вставить сюда все то , что нужно вывести, главный поток
+def main():
+    eel.init(settings.DIR_PATH + "\\templates")
+
+    set_auth()
+    set_parsers()
+    eel.print(f"Привет {settings.USERNAME}", "xbox")
+
+    @eel.expose
+    def loop():
+        if not settings.MAIN_LOOP.is_running():
+            settings.MAIN_LOOP.run_until_complete(asyncio.gather(*settings.TASKS, wait_parser()))
+
+    # close_callback - функция для закрытия приложения
+    eel.start("test.html", size=settings.WIND_SIZE, port=5050)
+
+
+if __name__ == "__main__":
+    main()
