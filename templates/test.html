@@ -14,43 +14,49 @@
         var email = "";
         var pass = "";
         var sec_code = "";
-        var auth_proc = false;
+        var signal = true;
         var resp;
+        function signall(){
+            return signal;
+        }
+        eel.expose(signall);
         function print(x, place){
             var elem = document.getElementById(place);
             var resp = "\n<br>" + x;
             elem.innerHTML += resp;
         }
         eel.expose(print);
-        function wait_new_parser_js(){
-            if((title != "") && (url != "") && (time != "") && (page != "")){
-                return [ title, url, time, page];
-            }
-            return false;
-        }
-        eel.expose(wait_new_parser_js);
-        async function create_parser_js(){
-            console.log(1);
+        function get_new_parser(){
+
             title = document.getElementById('Title').value;
             url = document.getElementById('Url').value;
             time = document.getElementById('Time').value;
             page = document.getElementById('Page').value;
-            resp = await eel.create_parser(title, url, time, page)();
-            console.log(resp);
+
+            return [title, url, time, page];
+        }
+        function set_signal_false(){
+            signal = false;
+        }
+        function set_signal_true(){
+            signal = true;
+        }
+        eel.expose(set_signal_true);
+        eel.expose(get_new_parser);
+        function print_push(resp){
+
             if (resp["type"] == "Error"){
-                console.log(2);
                 swal("Ошибка!", resp["msg"], "error");
             }
             else if (resp["type"] == "Success"){
-                swal("Успешно!", "Парсер успешно создан", "success");
+                swal("Успешно!", resp["msg"], "success");
             }
         }
+        eel.expose(print_push);
         async function auth(){
             email = document.getElementById('Email').value;
             password = document.getElementById('Password').value;
             resp = await eel.login(email, password)();
-            console.log(resp);
-            console.log("user" in resp);
             if ("user" in resp){
                 print("Вы авторизовались как "+resp["user"]["username"],"xbox");
             }
@@ -129,7 +135,7 @@
                 <input id="Url" type="text" name="Url">Ссылка<Br>
                     <input id="Page" type="text" name="Page">Количество страниц для анализа<Br>
                 <input id="Time" type="text" name="Time">Время итерации</p>
-                <p><input type="submit" onclick="create_parser_js()"></p>
+                <p><input type="submit" onclick="set_signal_false()"></p>
             </div>
             <div id="new_vk">
                 <p><b>Форма авторизации</b></p>

@@ -87,43 +87,39 @@ async def get(parser: Avito_parser, mode=True, cycle=True, page=1):
             await asyncio.sleep(parser.time * 60.0)
 
 
-@eel.expose
-def create_parser(title, url, time, count):
+async def create_parser(title, url, time, count):
     try:
         CURSOR.execute("""SELECT name from parsers""")
         parsers = CURSOR.fetchall()
         if title in parsers:
-            return {"type": "Error", "msg": "Парсер с таким названием уже существует."}
+            eel.print_push({"type": "Error", "msg": "Парсер с таким названием уже существует."})
         # создание объекта парсера
         new = Avito_parser(
             title=title, url=url, count=count, it=time, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
         )
-
         # Вставляем данные парсера в таблицу
         CURSOR.execute(
             f"""INSERT INTO 'parsers' VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
             '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
         )
-
         # Сохраняем изменения
         CONN.commit()
-
         # создаём таблицу для парсера
         CURSOR.execute(
             f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price', 'see')"""
         )
         ACTIVE_PARSERS[new.title] = new
+        eel.print_push({"type": "Success", "msg": "Парсер удачно создан."})
+        MAIN_LOOP.create_task(parser_work(parser=new))
 
-        MAIN_LOOP.run_until_complete(parser_work(parser=new))
-        return {"type": "Success", "msg": "Парсер удачно создан."}
     except Exception as e:
-        print(e)
-        return {"type": "Error", "msg": e}
+        eel.print_push({"type": "Error", "msg": e})
 
 
 # включает парсер и одновляет таблицу бд
 async def parser_work(parser):
     # считываем уже имеющиеся объявления
+
     CURSOR.execute(f"""SELECT url from {parser.title}""")
     ads = CURSOR.fetchall()
     for url in ads:
@@ -149,3 +145,14 @@ async def parser_work(parser):
 def parser_stop(parser_name: str):
     parser = ACTIVE_PARSERS[parser_name]
     parser.status = "not active"
+
+
+async def wait_parser():
+    while True:
+        signal = True
+        while signal:
+            await asyncio.sleep(1)
+            signal = eel.signall()()
+        re = eel.get_new_parser()()
+        MAIN_LOOP.create_task(create_parser(*re))
+        eel.set_signal_true()()
