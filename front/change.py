@@ -14,4 +14,4 @@ def сhange_pwd(old, new):
     if len(resp) == 2:
         pwd = bcrypt.hashpw(new.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         resp = post(f"http://localhost:80/change_pwd?email={ema}&password={pwd}")
-        #delete_password()
+        # delete_password()

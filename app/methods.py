@@ -92,10 +92,16 @@ async def create_parser(title, url, time, count):
         CURSOR.execute("""SELECT name from parsers""")
         parsers = CURSOR.fetchall()
         if title in parsers:
-            eel.print_push({"type": "Error", "msg": "Парсер с таким названием уже существует."})
+            eel.print_push(
+                {"type": "Error", "msg": "Парсер с таким названием уже существует."}
+            )
         # создание объекта парсера
         new = Avito_parser(
-            title=title, url=url, count=count, it=time, creation_date=datetime.now().strftime("%d %B %H:%M:%S")
+            title=title,
+            url=url,
+            count=count,
+            it=time,
+            creation_date=datetime.now().strftime("%d %B %H:%M:%S"),
         )
         # Вставляем данные парсера в таблицу
         CURSOR.execute(

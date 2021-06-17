@@ -8,15 +8,15 @@ import requests
 
 class Avito_parser:
     def __init__(
-            self,
-            title,
-            url,
-            it,
-            count,
-            status="active",
-            mailing=None,
-            creation_date=None,
-            update_date=None,
+        self,
+        title,
+        url,
+        it,
+        count,
+        status="active",
+        mailing=None,
+        creation_date=None,
+        update_date=None,
     ):
         self.update_date = update_date  # дата последнего обновления
         self.creation_date = creation_date  # дата создания
@@ -33,9 +33,9 @@ class Avito_parser:
 
     # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
     async def find_new_ads(
-            self,
-            mode=True,
-            new_ad=None,
+        self,
+        mode=True,
+        new_ad=None,
     ):
 
         ads_url = self.ads
@@ -49,13 +49,13 @@ class Avito_parser:
             link = "https://www.avito.ru" + title_link.get("href")
             price = (
                 info.find("span", attrs={"data-marker": "item-price"})
-                    .find(
+                .find(
                     "span",
                     attrs={
                         "class": "price-text-1HrJ_ text-text-1PdBw text-size-s-1PUdo"
                     },
                 )
-                    .get_text()
+                .get_text()
             )
 
             # для удобства создаём новый объект класса Ad
@@ -71,12 +71,10 @@ class Avito_parser:
                 if mode:
                     text = "----------New Ad!" + "\n" + title + "\n" + link
                     # присылает уведомление в ВК
-                    requests.post(f'http://localhost:70/send/?pk=443194153&text={text}')
+                    requests.post(f"http://localhost:70/send/?pk=443194153&text={text}")
 
                     # выводит уведомление в приложении
-                    eel.print(
-                        text, self.title
-                    )
+                    eel.print(text, self.title)
 
         return ads_new
 

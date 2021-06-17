@@ -26,7 +26,11 @@ CURSOR.execute("""CREATE TABLE IF NOT EXISTS settings (title, value)""")
 # если нет таблицы с настройками, то создаёт её и задаёт наальные настройки
 if settings_not_exist(CURSOR):
     sqlite_insert_query = """INSERT INTO settings (title, value) VALUES (?, ?);"""
-    default = [("window_size", "800, 600"), ("api_id", "7802615"), ("username", getuser())]
+    default = [
+        ("window_size", "800, 600"),
+        ("api_id", "7802615"),
+        ("username", getuser()),
+    ]
 
     CURSOR.executemany(sqlite_insert_query, default)
     CONN.commit()

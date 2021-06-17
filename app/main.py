@@ -21,7 +21,9 @@ def set_auth():
         try:
             resp = login(email=ema, password=pwd)
             info = resp["user"]
-            USER = User(username=info["username"], email=info["email"], vk_id=info["vk_id"])
+            USER = User(
+                username=info["username"], email=info["email"], vk_id=info["vk_id"]
+            )
             settings.USERNAME = USER.username
         except Exception:
             print("Ошибка авторизации")
@@ -48,7 +50,9 @@ def main():
     @eel.expose
     def loop():
         if not settings.MAIN_LOOP.is_running():
-            settings.MAIN_LOOP.run_until_complete(asyncio.gather(*settings.TASKS, wait_parser()))
+            settings.MAIN_LOOP.run_until_complete(
+                asyncio.gather(*settings.TASKS, wait_parser())
+            )
 
     # close_callback - функция для закрытия приложения
     eel.start("test.html", size=settings.WIND_SIZE, port=5050)
