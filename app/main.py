@@ -1,16 +1,18 @@
 import eel
-from keyring import get_password
-
-import settings
 import asyncio
-
-from app.models import Avito_parser, User
-from app.methods import parser_work, wait_parser
-from front.auth import login
+from keyring import get_password
+import settings
+from models import Avito_parser, User
+from methods import parser_work
+from auth import login
+from get import set_get
 
 """
 Файл для сборки
 """
+
+
+
 
 
 def set_auth():
@@ -41,21 +43,30 @@ def set_parsers():
 
 
 def main():
-    eel.init(settings.DIR_PATH + "\\templates")
+    set_auth()  # все auth-методы
+    set_parsers()  # вся информация о парсерах
+    set_get()  # все get-методы
+    eel.init('client')
 
-    set_auth()
-    set_parsers()
-    eel.print(f"Привет {settings.USERNAME}", "xbox")
+    # @eel.expose
+    # def start_all_parsers():
+    #     def started():
+    #         if not settings.MAIN_LOOP.is_running():
+    #             settings.MAIN_LOOP.run_until_complete(
+    #                 asyncio.gather(*settings.TASKS)
+    #             )
+    #     eel.spawn(started)
 
-    @eel.expose
-    def loop():
-        if not settings.MAIN_LOOP.is_running():
-            settings.MAIN_LOOP.run_until_complete(
-                asyncio.gather(*settings.TASKS, wait_parser())
-            )
-
-    # close_callback - функция для закрытия приложения
-    eel.start("test.html", size=settings.WIND_SIZE, port=5050)
+    eel.start({
+        'port': 3000
+    }, options={
+        'block': False,
+        'size': settings.WIND_SIZE,
+        'port': 8888,
+        'host': 'localhost',
+    }, suppress_error=True)
+    while True:
+        eel.sleep(1)
 
 
 if __name__ == "__main__":

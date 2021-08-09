@@ -12,7 +12,7 @@ class Avito_parser:
         title,
         url,
         it,
-        count,
+        count=1,
         status="active",
         mailing=None,
         creation_date=None,
@@ -43,12 +43,11 @@ class Avito_parser:
 
         for ad in new_ad:
             # ищем информацию о каждом объявлении
-            info = ad.find("div", attrs={"class": "iva-item-body-NPl6W"})
-            title_link = info.find("a", attrs={"data-marker": "item-title"})
+            title_link = ad.find("a", attrs={"data-marker": "item-title"})
             title = title_link.find("h3").get_text()
             link = "https://www.avito.ru" + title_link.get("href")
             price = (
-                info.find("span", attrs={"data-marker": "item-price"})
+                ad.find("span", attrs={"data-marker": "item-price"})
                 .find(
                     "span",
                     attrs={
@@ -71,10 +70,7 @@ class Avito_parser:
                 if mode:
                     text = "----------New Ad!" + "\n" + title + "\n" + link
                     # присылает уведомление в ВК
-                    requests.post(f"http://localhost:70/send/?pk=443194153&text={text}")
-
-                    # выводит уведомление в приложении
-                    eel.print(text, self.title)
+                    #requests.post(f"http://localhost:70/send/?pk=443194153&text={text}")
 
         return ads_new
 

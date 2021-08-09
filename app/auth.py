@@ -5,7 +5,7 @@ from requests import post
 from keyring import set_password, delete_password, get_password
 from json import loads
 
-from app.settings import CURSOR, USERNAME
+from settings import CURSOR, USERNAME
 
 
 @eel.expose

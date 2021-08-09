@@ -8,7 +8,7 @@ from getpass import getuser
 Файл для настроек
 """
 
-DIR_PATH = str(Path(os.getcwd()).parent)
+DIR_PATH = str(Path(os.getcwd()))
 
 
 def settings_not_exist(CURSOR):
@@ -19,15 +19,15 @@ def settings_not_exist(CURSOR):
     return False
 
 
-CONN = sqlite3.connect("../data/database.db")
+CONN = sqlite3.connect(database=DIR_PATH + "\\data\\database.db")
 CURSOR = CONN.cursor()
 CURSOR.execute("""CREATE TABLE IF NOT EXISTS settings (title, value)""")
 
-# если нет таблицы с настройками, то создаёт её и задаёт наальные настройки
+# если нет таблицы с настройками, то создаёт её и задаёт начальные настройки
 if settings_not_exist(CURSOR):
     sqlite_insert_query = """INSERT INTO settings (title, value) VALUES (?, ?);"""
     default = [
-        ("window_size", "800, 600"),
+        ("window_size", "1280, 720"),
         ("api_id", "7802615"),
         ("username", getuser()),
     ]

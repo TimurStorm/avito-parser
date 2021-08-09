@@ -1,9 +1,9 @@
 import bcrypt
 import eel
-from keyring import get_password, delete_password
+from keyring import get_password
 
-from app.settings import settings
-from front.auth import login
+from settings import settings
+from auth import login
 from requests import post
 
 
