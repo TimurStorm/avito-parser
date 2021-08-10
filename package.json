@@ -12,7 +12,8 @@
     "react-async": "^10.0.1",
     "react-dom": "^16.3.1",
     "react-scripts": "1.1.4",
-    "webpack": "^5.48.0"
+    "webpack": "^5.48.0",
+    "yarn": "^1.22.11"
   },
   "scripts": {
     "start:js": "react-scripts start",

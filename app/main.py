@@ -12,9 +12,6 @@ from get import set_get
 """
 
 
-
-
-
 def set_auth():
     pwd = get_password(service_name="Parser", username=f"{settings.USERNAME}_pwd")
     ema = get_password(service_name="Parser", username=f"{settings.USERNAME}_ema")
@@ -48,14 +45,15 @@ def main():
     set_get()  # все get-методы
     eel.init('client')
 
-    # @eel.expose
-    # def start_all_parsers():
-    #     def started():
-    #         if not settings.MAIN_LOOP.is_running():
-    #             settings.MAIN_LOOP.run_until_complete(
-    #                 asyncio.gather(*settings.TASKS)
-    #             )
-    #     eel.spawn(started)
+    @eel.expose
+    def start_all_parsers():
+        def started():
+            if not settings.MAIN_LOOP.is_running():
+                settings.MAIN_LOOP.run_until_complete(
+                    asyncio.gather(*settings.TASKS)
+                )
+
+        eel.spawn(started)
 
     eel.start({
         'port': 3000

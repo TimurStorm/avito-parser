@@ -6,16 +6,12 @@ import {eel} from '../eel';
 class Main extends Component {
   constructor(props) {
     super(props);
-    this.state = { ads: [] };
+    this.state = { parsers: props.parsers };
   }
-
-  async componentDidMount(){
-    
-  }
-  //<SupportOne/>
+  
   render() {
     return <div className='Main'>
-        <Ads/>
+        <Ads ads={this.state.ads}/>
     </div>
   }
 }

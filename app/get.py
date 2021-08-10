@@ -12,7 +12,7 @@ def set_get():
         settings.CURSOR.execute(f"""SELECT * from '{parser_name}'""")
         info = settings.CURSOR.fetchall()
         info = [list(i) for i in info]
-        return info
+        return {parser_name: info}
 
     @eel.expose
     def get_all_parsers():
