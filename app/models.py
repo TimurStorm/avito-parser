@@ -32,7 +32,7 @@ class Avito_parser:
         return self.title
 
     # проверяет список объявлений на наличие новых предложений и в случае обнаружения присылает уведомление в лс в вк
-    async def find_new_ads(
+    def find_new_ads(
         self,
         mode=True,
         new_ad=None,

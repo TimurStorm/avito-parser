@@ -1,7 +1,7 @@
 import Ads from './Templates/MainBlock';
 import React, { Component } from 'react';
 import '../../css/Main.css';
-import {eel} from '../eel';
+
 
 class Main extends Component {
   constructor(props) {

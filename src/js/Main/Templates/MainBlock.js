@@ -3,7 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import '../../../css/Scroll.css';
 import Ad from './Ad';
 import React from 'react';
-
+import { useSelector, useDispatch} from 'react-redux';
+import {async_eel_get_all_parsers, async_eel_get_parser_ads} from '../../Async/asyncActions';
 
 const Ads = makeStyles({
     colors:{
@@ -84,76 +85,26 @@ const Ads = makeStyles({
     },
     
 });
-//<Button className={classes.it}>Дешёвые</Button>
-//<Button className={classes.it}>Дорогие</Button>
+
+
+
 export default function StyledComponents(props) {
+    
     const classes = Ads(props);
-    let data = [
-        {
-            title: 'Toyota Supra 2004 года в почти идеальном состоянии, недорого',
-            price: 5000,
-            new: true,
-        },
-        {
-            title: 'Toyota Camry',
-            price: 4520,
-            new: false,
-        },
-        {
-            title: 'Toyota Rav4',
-            price: 7600,
-            new: false,
-        },
-        {
-            title: 'Toyota Supra',
-            price: 5000,
-            new: false,
-        },
-        {
-            title: 'Toyota Camry',
-            price: 4520,
-            new: false,
-        },
-        {
-            title: 'Toyota Rav4',
-            price: 7600,
-            new: false,
-        },
-        {
-            title: 'Toyota Supra',
-            price: 5000,
-            new: false,
-        },
-        {
-            title: 'Toyota Camry',
-            price: 4520,
-            new: false,
-        },
-        {
-            title: 'Toyota Rav4',
-            price: 7600,
-            new: false,
-        },
-        {
-            title: 'Toyota Supra',
-            price: 5000,
-            new: false,
-        },
-        {
-            title: 'Toyota Camry',
-            price: 4520,
-            new: false,
-        },
-        {
-            title: 'Toyota Rav4',
-            price: 7600,
-            new: false,
-        },
-    ];
-    let ads = data.map((ad)=> <Ad title={ad['title']} price={ad['price']} new={ad['new']} />);
+    
+    const dispatch = useDispatch();
+    dispatch(async_eel_get_all_parsers());
+    const parsers = useSelector(state => state.parsers);
+    dispatch(async_eel_get_parser_ads(parsers));
+    var data = useSelector(state => state.ads);        
+    console.log(data);
+    // TODO: ПОРЕШАТЬ ДАТУ НА ОБЪЕКТЫ ЧТОБЫ БЫЛИ ОБЪЯВЛЕНИЯ
+    let ads = data.map((ad, index)=> <Ad 
+    title={ad[0]} 
+    price={ad[1]} />);
     return <div className={classes.main}>
         <div className={classes.header}>Объявления</div>
-        <hr color={'#1b6259'} style={{marginBottom:4 , marginTop: 16}}/>
+        <hr color={'#1b6259'} style={{marginBottom:4 , marginTop:16 }}/>
         <div className={classes.filter}>
             <div className={classes.filts}>
                 <div className={classes.view}>

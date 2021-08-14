@@ -1,5 +1,4 @@
 import eel
-import asyncio
 from keyring import get_password
 import settings
 from models import Avito_parser, User
@@ -36,7 +35,6 @@ def set_parsers():
         if parser[4] == "active":
             new = Avito_parser(*parser)
             settings.ACTIVE_PARSERS[parser[0]] = new
-            settings.TASKS.append(parser_work(parser=new))
 
 
 def main():
@@ -47,13 +45,8 @@ def main():
 
     @eel.expose
     def start_all_parsers():
-        def started():
-            if not settings.MAIN_LOOP.is_running():
-                settings.MAIN_LOOP.run_until_complete(
-                    asyncio.gather(*settings.TASKS)
-                )
-
-        eel.spawn(started)
+        for parser in settings.ACTIVE_PARSERS.values():
+            eel.spawn(parser_work, parser)
 
     eel.start({
         'port': 3000
@@ -65,7 +58,6 @@ def main():
     }, suppress_error=True)
     while True:
         eel.sleep(1)
-
 
 if __name__ == "__main__":
     main()

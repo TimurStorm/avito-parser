@@ -11,12 +11,15 @@ class App extends Component {
   constructor(props) {
     super(props);
     eel.set_host("ws://localhost:8888");
-
+     
     this.state = {
     parsers: null,
     settings: null,
 
     };
+  }
+  async componentDidMount(){
+    await eel.start_all_parsers()();
   }
 
   render() {
