@@ -44,11 +44,8 @@ settings = dict(CURSOR.fetchall())
 
 WIND_SIZE = tuple([int(i) for i in settings["window_size"].split(", ")])
 
-API_ID = settings["api_id"]
-
 USERNAME = settings["username"]
 
-ACTIVE_PARSERS = {}
+ALL_PARSERS = {}
+WORKING_PARSERS = []
 TASKS = []
-
-MAIN_LOOP = asyncio.get_event_loop()

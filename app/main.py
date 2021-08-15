@@ -1,7 +1,7 @@
 import eel
 from keyring import get_password
 import settings
-from models import Avito_parser, User
+from models import AvitoParser
 from methods import parser_work
 from auth import login
 from get import set_get
@@ -33,8 +33,8 @@ def set_parsers():
     for parser in parsers:
         parser = list(parser)
         if parser[4] == "active":
-            new = Avito_parser(*parser)
-            settings.ACTIVE_PARSERS[parser[0]] = new
+            new = AvitoParser(*parser)
+            settings.ALL_PARSERS[parser[0]] = new
 
 
 def main():
@@ -45,8 +45,10 @@ def main():
 
     @eel.expose
     def start_all_parsers():
-        for parser in settings.ACTIVE_PARSERS.values():
-            eel.spawn(parser_work, parser)
+        for parser in settings.ALL_PARSERS.values():
+            if parser not in settings.WORKING_PARSERS:
+                settings.WORKING_PARSERS.append(parser)
+                eel.spawn(parser_work, parser)
 
     eel.start({
         'port': 3000
@@ -58,6 +60,7 @@ def main():
     }, suppress_error=True)
     while True:
         eel.sleep(1)
+
 
 if __name__ == "__main__":
     main()

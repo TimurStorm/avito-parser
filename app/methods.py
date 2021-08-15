@@ -1,29 +1,19 @@
 import eel
 import requests
-
 from bs4 import BeautifulSoup
 from datetime import datetime
 from time import time as tm
 
-from models import Avito_parser
+from models import AvitoParser
 from settings import *
 
 """
 Файл для основных методов
 """
 
-'''async def parser_update(parser: Avito_parser):
-    futures = []
-
-    for i in range(parser.count):
-        futures.append(
-            MAIN_LOOP.create_task(get(parser=parser, cycle=False, mode=False, page=i))
-        )
-    await asyncio.gather(*futures)'''
-
 
 # отпралвяет запрос, получает html ответ, проводит первичную фильтрацию информации
-def get(parser: Avito_parser, mode=True, cycle=True, page=1):
+def get_page(parser: AvitoParser, mode=True):
     start_time = tm()
     try:
 
@@ -66,7 +56,7 @@ def get(parser: Avito_parser, mode=True, cycle=True, page=1):
 def create_parser(title, url, time):
     try:
         # создание объекта парсера
-        new = Avito_parser(
+        new = AvitoParser(
             title=title,
             url=url,
             it=time,
@@ -83,7 +73,7 @@ def create_parser(title, url, time):
         CURSOR.execute(
             f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price', 'see')"""
         )
-        ACTIVE_PARSERS[new.title] = new
+        ALL_PARSERS[new.title] = new
         parser_work(parser=new)
         return True
     except Exception as e:
@@ -99,19 +89,7 @@ def parser_work(parser):
         url = url[0]
         parser.ads.append(url)
 
-    # запускаем обработчик новых объявлений( без оповещений)
-    '''futures = []
-
-    futures.append(MAIN_LOOP.create_task(parser_update(parser=parser)))
-    await asyncio.gather(*futures)'''
-
     # запускаем основной цикл поиска ( с оповещениями)
     while parser.status == 'active':
-        get(parser)
+        get_page(parser)
         eel.sleep(parser.time*60)
-
-
-# остановка парсера
-def parser_stop(parser_name: str):
-    parser = ACTIVE_PARSERS[parser_name]
-    parser.status = "not active"

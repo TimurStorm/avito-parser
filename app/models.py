@@ -1,12 +1,10 @@
-import eel
-import requests
 
 """
-Файл для объявления моделей
+Файл для моделей
 """
 
 
-class Avito_parser:
+class AvitoParser:
     def __init__(
         self,
         title,
@@ -63,14 +61,9 @@ class Avito_parser:
             # если объявления нет в списке
             if new.url not in ads_url:
 
-                # добавляем новое объявление в список для бд и будующей проверки
+                # добавляем новое объявление будующей проверки
                 ads_new.append((new.title, new.url, new.price, False))
                 self.ads.append(new.url)
-
-                if mode:
-                    text = "----------New Ad!" + "\n" + title + "\n" + link
-                    # присылает уведомление в ВК
-                    #requests.post(f"http://localhost:70/send/?pk=443194153&text={text}")
 
         return ads_new
 
@@ -81,12 +74,4 @@ class Ad:
         self.price = price
         self.url = url
 
-    def __str__(self):
-        return f"Объявление: {self.title} по цене {self.price}"
 
-
-class User:
-    def __init__(self, username, vk_id, email):
-        self.username = username
-        self.email = email
-        self.vk_id = vk_id
