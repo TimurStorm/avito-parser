@@ -11,12 +11,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     eel.set_host("ws://localhost:8888");
-     
-    this.state = {
-    parsers: null,
-    settings: null,
-
-    };
   }
   async componentDidMount(){
     await eel.start_all_parsers()();
@@ -27,7 +21,7 @@ class App extends Component {
     return (
       <div className="App">
         <Menu />
-        <Main parsers={this.state.parsers}/>
+        <Main />
       </div>
     );
   }

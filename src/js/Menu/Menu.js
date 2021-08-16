@@ -1,37 +1,68 @@
 import '../../css/Menu.css';
 import MenuButton from './Buttons/MenuButtons';
-import {Component} from 'react';
+import {useEffect} from 'react';
 import React from 'react';
+import {async_eel_get_all_parsers} from '../Async/asyncActions.js';
+
 import CreateParser from './Buttons/СreateParser';
 import homeOutline from '@iconify-icons/eva/home-outline';
 import starOutline from '@iconify-icons/eva/star-outline';
 import settings2Outline from '@iconify-icons/eva/settings-2-outline';
 import personOutline from '@iconify-icons/eva/person-outline'
+import bookOutline from '@iconify-icons/eva/book-outline';
+import {connect} from 'react-redux';
 
 
-class Menu extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      titles : ['Главная', 'Избранное', 'Настройки', 'Профиль'],
-      icons : [homeOutline,  starOutline, settings2Outline, personOutline],
-      hrefs : ['.', '/favorite', '/settings','/profile']
-    };
-  }
+function Componet(props){
 
-  render() {
-    let buttons = this.state.titles.map((title, id=this.state.titles.indexOf(title)) => <MenuButton 
+  useEffect(() => {
+    props.getParsers();
+  },[]);
+
+  let titles = ['Избранное', 'Настройки', 'Профиль'];
+  let icons = [starOutline, settings2Outline, personOutline];
+  let hrefs = props.hrefs;
+  let parsers = props.parsers; 
+
+  let low_buttons = titles.map((title, id=titles.indexOf(title)) => <MenuButton 
+  title={title} 
+  href = {hrefs[id]}
+  icon={icons[id]} />);
+
+  let pars_buttons;
+  if (parsers[0]){
+    pars_buttons = parsers[0].map((title, id=titles.indexOf(title)) => <MenuButton 
     title={title} 
-    id={id}
-    href = {this.state.hrefs[id]}
-    icon={this.state.icons[id]} />)
-    return (
-      <div className="Menu">
-          {buttons}
-          <CreateParser />
-      </div>
-    );
+    href = {'/parser/'+id}
+    icon={bookOutline} />);
+  }
+  
+  return <div className="Menu">
+        <MenuButton title='Главная' icon={homeOutline} href='.'/>
+        <CreateParser />
+        <hr color={'#17554d'} style={{marginTop:0 , marginBottom: 17}} size={1}/>
+        {pars_buttons}
+        <hr color={'#17554d'} style={{marginTop:0 , marginBottom: 17}} size={1}/>
+        {low_buttons}
+    </div>
+  
+}
+
+let mapStateToProps = (state) => {
+  return {
+      hrefs: state.hrefs,
+      parsers: state.parsers
   }
 }
 
-export default Menu;
+let mapDispatchToProps = (dispatch) => {
+  return {
+      getParsers: () => {
+          dispatch(async_eel_get_all_parsers());
+      }
+  }
+}
+
+let MenuConnect = connect(mapStateToProps, mapDispatchToProps)(Componet)
+
+export default MenuConnect;

@@ -77,12 +77,16 @@ export default function StyledComponents() {
   const [url, setUrl] = React.useState('');
   const [timer, setTimer] = React.useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(title);
-    console.log(url);
-    console.log(timer);
-    eel.create_parser(title, url, timer)();
+    let responce = await eel.create_parser(title, url, timer)();
+    if (responce){
+      handleClose();
+    }
+    else {
+      //TODO: переделать в всплывающее уведомление
+      console.log('Ошибка создания парсера');
+    }
   }
 
   const handleClose = () => {

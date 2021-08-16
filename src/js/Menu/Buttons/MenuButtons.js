@@ -52,11 +52,10 @@ const MenuButton = makeStyles({
 export default function StyledComponents(props) {
     const classes = MenuButton();
     let title = props.title;
-    let id = props.id;
     let icon = props.icon;
     let href = props.href;
     let click = props.click;
-    return <Button className={classes.main} href={href} id={id} onClick={click}>
+    return <Button className={classes.main} href={href} onClick={click}>
         <div className={classes.sign}></div>
         <div className={classes.label}>
             {title}

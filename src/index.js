@@ -12,7 +12,8 @@ import thunk from 'redux-thunk';
 
 const defaultState = {
     parsers: [],
-    ads: []
+    ads: [],
+    hrefs: [ '/favorite', '/settings','/profile']
 }
 const GET_PARSERS = 'GET_PARSERS';
 const GET_ADS = 'GET_ADS';
@@ -22,9 +23,17 @@ const GET_ADS = 'GET_ADS';
 const reducer = (state = defaultState, action) => {
     switch (action.type){
         case GET_PARSERS:
-            return {...state, parsers: action.payload};
+
+            if (action.payload.length != state.parsers.length){
+                state = {...state, parsers: action.payload};
+            }
+            return {...state};
         case GET_ADS:
-            return {...state, ads: action.payload};
+
+            if (action.payload.length != state.ads.length){
+                state = {...state, ads: action.payload};
+            }
+            return {...state};
         default:
             return state;
     }
