@@ -1,10 +1,14 @@
 import { Button, ButtonGroup} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import '../../../css/Scroll.css';
 import Ad from './Ad';
-import React from 'react';
-import { useSelector, useDispatch} from 'react-redux';
+import React, {useEffect} from 'react';
+import { useSelector, useDispatch, shallowEqual, connect} from 'react-redux';
 import {async_eel_get_all_parsers, async_eel_get_parser_ads} from '../../Async/asyncActions';
+
+
 
 const Ads = makeStyles({
     colors:{
@@ -86,22 +90,22 @@ const Ads = makeStyles({
     
 });
 
-
-
-export default function StyledComponents(props) {
+function Componet(props) {
     
     const classes = Ads(props);
-    
-    const dispatch = useDispatch();
-    dispatch(async_eel_get_all_parsers());
-    const parsers = useSelector(state => state.parsers);
-    dispatch(async_eel_get_parser_ads(parsers));
-    var data = useSelector(state => state.ads);        
-    console.log(data);
-    // TODO: ПОРЕШАТЬ ДАТУ НА ОБЪЕКТЫ ЧТОБЫ БЫЛИ ОБЪЯВЛЕНИЯ
-    let ads = data.map((ad, index)=> <Ad 
-    title={ad[0]} 
-    price={ad[1]} />);
+
+    useEffect(() => {
+        props.getParsers();
+        props.getAds();
+        setInterval(() => { props.getAds()}, 1500);
+    },[])
+    console.log(props);
+
+    const ads = props.data.map((ad)=> <Ad 
+        title={ad[0]} 
+        price={ad[1]}
+        parser={ad[2]} />);
+    // TODO: ПОРЕШАТЬ ДАТУ НА ОБЪЕКТЫ ЧТОБЫ БЫЛИ ОБЪЯВЛЕНИЯ 
     return <div className={classes.main}>
         <div className={classes.header}>Объявления</div>
         <hr color={'#1b6259'} style={{marginBottom:4 , marginTop:16 }}/>
@@ -112,6 +116,7 @@ export default function StyledComponents(props) {
                     <Button className={classes.it}>Строки</Button>
                     <Button className={classes.it}>Карточки</Button>
                 </ButtonGroup>
+                
                 </div>
                 <div className={classes.label} style={{paddingTop:3}}>
                     Вид:
@@ -135,3 +140,25 @@ export default function StyledComponents(props) {
         </div>
     </div>  
 }
+
+let mapStateToProps = (state) => {
+    return {
+        parsers: state.parsers,
+        data: state.ads
+    }
+}
+
+let mapDispatchToProps = (dispatch) => {
+    return {
+        getParsers: () => {
+            dispatch(async_eel_get_all_parsers());
+        },
+        getAds: () => {
+            dispatch(async_eel_get_parser_ads());
+        }
+    }
+}
+
+const ComponetConnect = connect(mapStateToProps, mapDispatchToProps)(Componet);
+
+export default ComponetConnect;

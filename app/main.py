@@ -1,30 +1,14 @@
 import eel
 from keyring import get_password
 import settings
-from models import AvitoParser
+from models import AvitoParser, User
 from methods import parser_work
-from auth import login
+from auth import set_auth
 from get import set_get
 
 """
 Файл для сборки
 """
-
-
-def set_auth():
-    pwd = get_password(service_name="Parser", username=f"{settings.USERNAME}_pwd")
-    ema = get_password(service_name="Parser", username=f"{settings.USERNAME}_ema")
-
-    if ema is not None and pwd is not None:
-        try:
-            resp = login(email=ema, password=pwd)
-            info = resp["user"]
-            USER = User(
-                username=info["username"], email=info["email"], vk_id=info["vk_id"]
-            )
-            settings.USERNAME = USER.username
-        except Exception:
-            print("Ошибка авторизации")
 
 
 def set_parsers():
@@ -38,11 +22,12 @@ def set_parsers():
 
 
 def main():
-    set_auth()  # все auth-методы
-    set_parsers()  # вся информация о парсерах
-    set_get()  # все get-методы
+    set_auth()  # подключение auth-методов
+    set_parsers()  # подгрузка информации о парсерах
+    set_get()  # подключение get-методов
     eel.init('client')
 
+    # функция включения парсеров
     @eel.expose
     def start_all_parsers():
         for parser in settings.ALL_PARSERS.values():

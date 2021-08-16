@@ -24,7 +24,6 @@ const reducer = (state = defaultState, action) => {
         case GET_PARSERS:
             return {...state, parsers: action.payload};
         case GET_ADS:
-               
             return {...state, ads: action.payload};
         default:
             return state;

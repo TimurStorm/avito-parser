@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sqlite3
 from pathlib import Path
@@ -11,6 +10,7 @@ from getpass import getuser
 DIR_PATH = str(Path(os.getcwd()))
 
 
+# проверка на наличие настроек
 def settings_not_exist(CURSOR):
     CURSOR.execute("""SELECT * from settings""")
     s = CURSOR.fetchall()
@@ -19,6 +19,7 @@ def settings_not_exist(CURSOR):
     return False
 
 
+# подключение к базе данных
 CONN = sqlite3.connect(database=DIR_PATH + "\\data\\database.db")
 CURSOR = CONN.cursor()
 CURSOR.execute("""CREATE TABLE IF NOT EXISTS settings (title, value)""")
@@ -26,26 +27,25 @@ CURSOR.execute("""CREATE TABLE IF NOT EXISTS settings (title, value)""")
 # если нет таблицы с настройками, то создаёт её и задаёт начальные настройки
 if settings_not_exist(CURSOR):
     sqlite_insert_query = """INSERT INTO settings (title, value) VALUES (?, ?);"""
-    default = [
+    default_settings = [
         ("window_size", "1280, 720"),
-        ("api_id", "7802615"),
         ("username", getuser()),
     ]
 
-    CURSOR.executemany(sqlite_insert_query, default)
+    CURSOR.executemany(sqlite_insert_query, default_settings)
     CONN.commit()
 
 CURSOR.execute(
     """CREATE TABLE IF NOT EXISTS parsers (name, url , timer, count, status, mailing, creation_date, update_date)"""
 )
 
+# подгрузка настроек из базы данных
 CURSOR.execute("""SELECT * from settings""")
-settings = dict(CURSOR.fetchall())
+sett = dict(CURSOR.fetchall())
 
-WIND_SIZE = tuple([int(i) for i in settings["window_size"].split(", ")])
+WIND_SIZE = tuple([int(i) for i in sett["window_size"].split(", ")])
 
-USERNAME = settings["username"]
+USERNAME = sett["username"]
 
 ALL_PARSERS = {}
 WORKING_PARSERS = []
-TASKS = []

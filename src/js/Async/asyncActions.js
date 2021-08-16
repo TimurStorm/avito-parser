@@ -7,8 +7,8 @@ export function async_eel_get_all_parsers() {
         eel.get_all_parsers()().then(value => dispatch(getParsersAction(value)));
     };
 }
-export function async_eel_get_parser_ads(parser) {
+export function async_eel_get_parser_ads() {
     return function (dispatch) {
-        eel.get_parser_ads(parser)().then(value => dispatch(getAdsAction(value)));
+        eel.get_parser_ads()().then(value => dispatch(getAdsAction(value)));
     };
 }

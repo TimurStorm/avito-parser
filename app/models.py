@@ -1,6 +1,6 @@
 
 """
-Файл для моделей
+Файл для объявления моделей
 """
 
 
@@ -73,5 +73,12 @@ class Ad:
         self.title = title
         self.price = price
         self.url = url
+
+
+class User:
+    def __init__(self, username, email, vk_id):
+        self.username = username
+        self.email = email
+        self.vk_id = vk_id
 
 
