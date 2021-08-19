@@ -77,6 +77,15 @@ export default function StyledComponents() {
   const [url, setUrl] = React.useState('');
   const [timer, setTimer] = React.useState('');
 
+  
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleToggle = () => {
+    setOpen(!open);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     let responce = await eel.create_parser(title, url, timer)();
@@ -88,13 +97,6 @@ export default function StyledComponents() {
       console.log('Ошибка создания парсера');
     }
   }
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleToggle = () => {
-    setOpen(!open);
-  };
 
   const marks =[
     {

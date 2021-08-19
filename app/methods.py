@@ -80,6 +80,9 @@ def create_parser(title, url, time):
         return False
 
 
+
+
+
 # включает парсер и одновляет таблицу бд
 def parser_work(parser):
     # считываем уже имеющиеся объявления
@@ -92,4 +95,4 @@ def parser_work(parser):
     # запускаем основной цикл поиска ( с оповещениями)
     while parser.status == 'active':
         get_page(parser)
-        eel.sleep(parser.time*60)
+        eel.sleep(parser.time * 60)

@@ -4,6 +4,8 @@ import {useEffect} from 'react';
 import React from 'react';
 import {async_eel_get_all_parsers} from '../Async/asyncActions.js';
 
+import {Grid} from "@material-ui/core";
+
 import CreateParser from './Buttons/СreateParser';
 import homeOutline from '@iconify-icons/eva/home-outline';
 import starOutline from '@iconify-icons/eva/star-outline';
@@ -37,14 +39,16 @@ function Componet(props){
     icon={bookOutline} />);
   }
   
-  return <div className="Menu">
+  return <Grid  item  md={2} lg={2} sm={2} xs={2} className="Menu">
         <MenuButton title='Главная' icon={homeOutline} href='.'/>
         <CreateParser />
-        <hr color={'#17554d'} style={{marginTop:0 , marginBottom: 17}} size={1}/>
-        {pars_buttons}
-        <hr color={'#17554d'} style={{marginTop:0 , marginBottom: 17}} size={1}/>
+        <hr color={'#17554d'} style={{marginTop:0 , marginBottom: 17}} size={2}/>
+        <div className='Parsers'>
+          {pars_buttons}
+        </div>
+        <hr color={'#17554d'} style={{marginTop:0 , marginBottom: 17}} size={2}/>
         {low_buttons}
-    </div>
+    </Grid>
   
 }
 

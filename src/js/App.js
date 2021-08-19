@@ -1,9 +1,13 @@
 import '../css/App.css';
 import Menu from './Menu/Menu';
-import Main from './Main/Main';
+import Ads from './Main/Templates/MainBlock';
+import AdInfo from './Main/Templates/AdInfo'; 
+import SupportOne from './Main/Templates/Support-1';
+import SupportTwo from './Main/Templates/Support-2';
 import React, { Component } from "react";
 import "../css/App.css";
 import {eel} from './eel';
+import Grid from '@material-ui/core/Grid';
 
 
 
@@ -19,9 +23,18 @@ class App extends Component {
   render() {
     
     return (
+      
       <div className="App">
-        <Menu />
-        <Main />
+        <Grid container
+          direction="row"
+          
+          >
+           <Menu/>
+           <Ads/>
+           <AdInfo/>
+          </Grid>
+        
+        
       </div>
     );
   }
