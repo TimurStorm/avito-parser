@@ -2,7 +2,7 @@ import { Grid, ThemeProvider, TextField} from '@material-ui/core';
 import { makeStyles , createTheme} from '@material-ui/core/styles';
 import '../../../css/Scroll.css';
 import Ad from './Ad';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import searchOutline from '@iconify-icons/eva/search-outline';
 import {connect} from 'react-redux';
 import {async_eel_get_all_parsers, async_eel_get_parser_ads} from '../../Async/asyncActions';
@@ -11,6 +11,7 @@ const AdInfo = makeStyles({
     main: {
         height: 623,
         width:"30%",
+        minWidth: 200,
         padding: '24px 15px',
         backgroundColor: '#102326',
         border: '0 solid',
@@ -103,19 +104,25 @@ const theme = createTheme({
 function Componet(props) {
     
     const classes = AdInfo(props);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         props.getParsers();
         props.getAds();
         setInterval(() => { props.getAds()}, 1500);
     },[])
-    const ads = props.data.map((ad)=> <Ad 
+
+    const filteredData = props.data.filter( elem => {
+        return elem[0].toLowerCase().includes(search.toLowerCase());
+    });
+
+    const ads = filteredData.map((ad)=> <Ad 
         title={ad[0]} 
         price={ad[1]}
         parser={ad[2]}
         url={ad[3]} />);
     // TODO: ПОРЕШАТЬ ДАТУ НА ОБЪЕКТЫ ЧТОБЫ БЫЛИ ОБЪЯВЛЕНИЯ 
-    return <Grid  item  md={2} lg={2} sm={2} xs={3} className={classes.main}>
+    return <Grid  item  md={2} lg={2} sm={2} xs={2} className={classes.main}>
         {document.documentElement.clientWidth >= 880 &&
             <div className={classes.header}>Объявления</div>
         }
@@ -131,6 +138,7 @@ function Componet(props) {
                     InputProps={{
                         className: classes.textField
                     }}
+                    onChange={(event) => setSearch(event.target.value)}
                     />
                 </div>
             

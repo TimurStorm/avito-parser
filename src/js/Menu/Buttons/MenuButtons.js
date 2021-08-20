@@ -13,7 +13,8 @@ const MenuButton = makeStyles({
         
         marginBottom: 17,
         height: 30,
-        width: 180,
+        width: '100%',
+        minWidth: 200,
         fontFamily: 'Rubik',
         fontWeight: 'regular',
         padding: 0,

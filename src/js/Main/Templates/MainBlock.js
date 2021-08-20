@@ -65,7 +65,7 @@ const Ads = makeStyles({
         price = props.adinfo['price'];
     }
     
-    return <Grid item lg={7} md={6} sm={5}  xs={4} className={classes.main}>
+    return <Grid item lg={8} md={8} sm={8}  xs={8} className={classes.main}>
         {props.adinfo &&
             <div>
                 <div className={classes.header}>{title}</div>

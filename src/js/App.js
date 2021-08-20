@@ -27,7 +27,7 @@ class App extends Component {
       <div className="App">
         <Grid container
           direction="row"
-          
+          wrap='nowrap'
           >
            <Menu/>
            <Ads/>

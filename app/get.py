@@ -58,7 +58,6 @@ def set_get():
         for p in desc_p:
             desc += p.get_text()
 
-        print('описание:', desc)
         return {'img': img,
                 'desc': desc,
                 'title': info[0][0],
