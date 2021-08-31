@@ -1,12 +1,17 @@
 .Menu{
     background-color: #102326;
-    width:200px;
-    height: 92vh;
+    min-width: 220px;
+    height: 100vh;
     padding: 50px 10px;
+    padding-bottom: 0;
     font-family: Rubik;
     font-weight: 500;
     font-size: 15px;
     color: #dcdcdc;
     float: left;
     margin: 0;
+}
+
+.Parsers{
+    height: 187.72;
 }

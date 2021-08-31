@@ -1,5 +1,4 @@
 import eel
-from keyring import get_password
 import settings
 from models import AvitoParser, User
 from methods import parser_work

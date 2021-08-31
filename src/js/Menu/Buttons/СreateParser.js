@@ -2,7 +2,7 @@ import React from 'react';
 import Backdrop from '@material-ui/core/Backdrop';
 import MenuButton from './MenuButtons';
 import plusCircleOutline from '@iconify-icons/eva/plus-circle-outline';
-import { makeStyles, createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { makeStyles, createTheme, ThemeProvider} from '@material-ui/core/styles';
 import { Icon} from '@iconify/react';
 import closeOutline  from '@iconify-icons/eva/close-outline';
 import TextField from '@material-ui/core/TextField';
@@ -19,7 +19,7 @@ const CreateParser = makeStyles((theme) => ({
     height: 300,
     width: 400,
     backgroundColor: '#102326',
-    padding: '15px 25px',
+    padding: 24,
     border: '0 solid',
     borderRadius: 5,
     color: '#dfdfdf',
@@ -77,9 +77,19 @@ export default function StyledComponents() {
   const [url, setUrl] = React.useState('');
   const [timer, setTimer] = React.useState('');
 
+  
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleToggle = () => {
+    setOpen(!open);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     let responce = await eel.create_parser(title, url, timer)();
+    console.log(responce);
     if (responce){
       handleClose();
     }
@@ -88,13 +98,6 @@ export default function StyledComponents() {
       console.log('Ошибка создания парсера');
     }
   }
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleToggle = () => {
-    setOpen(!open);
-  };
 
   const marks =[
     {
