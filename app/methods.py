@@ -1,9 +1,7 @@
 import eel
 import requests
-from bs4 import BeautifulSoup
 from datetime import datetime
 from time import time as tm
-
 from models import AvitoParser
 from settings import *
 
@@ -17,39 +15,51 @@ def get_page(parser: AvitoParser, mode=True):
     start_time = tm()
     try:
 
-        response = requests.get(parser.url)
-        page_info = response.text
-        # получаем код ответа
-        status_code = str(response.status_code)
+        params = {
+            'query': parser.title.replace(' ', '+'),
+            'limit': 50,
+            'display': 'list',
+            'locationId': 650400,
+            'searchRadius': 100,
+            'lastStamp': 1610905380,
+            'key': 'af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir',
+        }
 
-        # начальная фильтрация контента
-        soup = BeautifulSoup(page_info, "lxml")
-        all_ads = soup.find("div", attrs={"data-marker": "catalog-serp"})
+        resp = requests.get('https://m.avito.ru/api/9/items', params=params).json()
+        items = resp['result']['items']
+        ads_new = []
+        for item in items:
+            value = item['value']
+            if item['type'] != 'vip':
+                if 'list' in value.keys():
+                    value = value['list']
+                pk = value['id']
+                title = value['title']
+                price = value['price']
+                if pk not in parser.ads:
+                    print('Новое объявление!')
+                    ads_new.append((title, pk, price))
 
-        # все сведения об объявлениях
-        ads = all_ads.find_all("div", attrs={"data-marker": "item"})
-
-        # переходим в обработчик новых объявлений
-        ads_new = parser.find_new_ads(new_ad=ads, mode=mode)
 
         # записываем изменения в базу данных
         CURSOR.executemany(
-            f"INSERT INTO '{parser.title}' VALUES (?,?,?,?)", ads_new
+            f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new
         )
+        CONN.commit()
         info = (datetime.now().strftime("%d %B %H:%M:%S"), parser.title)
         sql = f"""UPDATE parsers SET update_date = ? WHERE name = ?"""
         CURSOR.execute(sql, info)
         CONN.commit()
         # Сохраняем изменения
-        CONN.commit()
-    except AttributeError:
-        status_code = 400
+        for ad in ads_new:
+            pk = ad[1]
+            parser.ads.append(pk)
+        print(f"====={parser.title}=====")
+        print(f"Status code: {resp['status']}")
+        print(f"Time spent: {round(tm() - start_time, 3)} sec")
+    except Exception as e:
+        print(e)
 
-    print(f"====={parser.title}=====")
-    print(f"Status code: {status_code}")
-    print(f"Time spent: {round(tm() - start_time, 3)} sec")
-    if status_code != 400:
-        print(f"Ads found: {len(ads)} ads")
 
 
 @eel.expose
@@ -71,27 +81,24 @@ def create_parser(title, url, time):
         CONN.commit()
         # создаём таблицу для парсера
         CURSOR.execute(
-            f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('name', 'url' , 'price', 'see')"""
+            f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('title', 'pk' , 'price')"""
         )
         ALL_PARSERS[new.title] = new
-        parser_work(parser=new)
+        WORKING_PARSERS.append(new)
+        eel.spawn(parser_work, new)
         return True
     except Exception as e:
         return False
 
 
-
-
-
 # включает парсер и одновляет таблицу бд
 def parser_work(parser):
     # считываем уже имеющиеся объявления
-    CURSOR.execute(f"""SELECT url from {parser.title}""")
+    CURSOR.execute(f"""SELECT pk from {parser.title}""")
     ads = CURSOR.fetchall()
-    for url in ads:
-        url = url[0]
-        parser.ads.append(url)
-
+    for pk in ads:
+        pk = pk[0]
+        parser.ads.append(pk)
     # запускаем основной цикл поиска ( с оповещениями)
     while parser.status == 'active':
         get_page(parser)

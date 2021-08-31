@@ -3,6 +3,7 @@ import sqlite3
 from pathlib import Path
 from getpass import getuser
 
+
 """
 Файл для настроек
 """

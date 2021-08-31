@@ -11,7 +11,7 @@ const MenuButton = makeStyles({
     
     main: {
         
-        marginBottom: 17,
+        marginBottom: 25,
         height: 30,
         width: '100%',
         minWidth: 200,

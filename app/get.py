@@ -1,7 +1,7 @@
 import eel
 import requests
-from bs4 import BeautifulSoup
-
+from time import ctime, strftime, strptime
+from pprint import pprint
 import settings
 
 """
@@ -41,25 +41,36 @@ def set_get():
         return sett
 
     @eel.expose
-    def get_ad_info(url: str, parser: str):
-        response = requests.get(url)
-        page_info = response.text
+    def get_ad_info(pk, parser: str):
 
-        settings.CURSOR.execute(f"""SELECT name, price from {parser} WHERE url='{url}'""")
-        info = settings.CURSOR.fetchall()
+        months = ['Января', 'Февраля', 'Марта', "Апреля", "Мая", "Июня",
+                  "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"]
 
-        soup = BeautifulSoup(page_info, 'lxml')
-        data = soup.find("div", attrs={"class": "item-view-content"})
-        img = data.find_all('div', attrs={"class": "gallery-img-frame js-gallery-img-frame"})
-        img = [i.get('data-url') for i in img]
+        try:
+            params = {
+                "key": 'af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir',
+            }
+            url_more_data_2 = 'https://m.avito.ru/api/15/items/' + str(pk)
+            ad_data = requests.get(url_more_data_2, params=params).json()
 
-        desc_p = data.find('div', attrs={"class": "item-description"}).find_all('p')
-        desc = ''
-        for p in desc_p:
-            desc += p.get_text()
+            pprint(ad_data)
 
-        return {'img': img,
-                'desc': desc,
-                'title': info[0][0],
-                'price': info[0][1]
-                }
+            date = ctime(ad_data['time'])
+            date = strftime('%d %m %H:%M', strptime(date, '%a %b %d  %H:%M:%S %Y')).split()
+            date[1] = months[int(date[1])-1]
+            date = ' '.join(date)
+
+            url = ad_data['seo']['canonicalUrl']
+
+            params = ad_data['parameters']['flat']
+
+            return {'img': ad_data['images'],
+                    'desc': ad_data['description'],
+                    'title': ad_data['title'],
+                    'price': ad_data['price'],
+                    'address': ad_data['address'],
+                    'date': date,
+                    'params': params,
+                    'url': url}
+        except Exception as e:
+            print(e)

@@ -14,8 +14,7 @@ const Ad = makeStyles({
     main: {
         backgroundColor: '#223639',
         minHeight: 30,
-        width:'95%',
-        
+        width: '100%',
         border: '0 solid',
         borderRadius: 5,
         marginBottom: 5,
@@ -38,16 +37,17 @@ const Ad = makeStyles({
     },
     title: {
         fontSize: 13,
-        fontWeight: 500,
-        float: 'left',
+        
+        
         marginTop: 7,
-        marginLeft: 7,
+        marginLeft: 4,
     },
     price: {
-        float: 'left',
+        fontWeight: 'bold',
         marginTop: 6,
         marginLeft: 8,
         fontSize: 13,
+        
     },
     new:{
         float: 'left',
@@ -67,6 +67,10 @@ function Componet(props) {
     let openAd = () => {
         props.getAdInfo(url, parser);
     };
+
+    if (title.length > 26){
+        title = title.slice(0, 20) + '...';
+    }
 
     let nw_icon = null;
 

@@ -1,6 +1,7 @@
-import { Grid, ThemeProvider, TextField} from '@material-ui/core';
-import { makeStyles , createTheme} from '@material-ui/core/styles';
+import { Grid, ThemeProvider, TextField, Checkbox} from '@material-ui/core';
+import { makeStyles , createTheme, withStyles} from '@material-ui/core/styles';
 import '../../../css/Scroll.css';
+import {Button, Menu, MenuItem} from '@material-ui/core';
 import Ad from './Ad';
 import React, {useEffect, useState} from 'react';
 import searchOutline from '@iconify-icons/eva/search-outline';
@@ -10,9 +11,8 @@ import {async_eel_get_all_parsers, async_eel_get_parser_ads} from '../../Async/a
 const AdInfo = makeStyles({
     main: {
         height: 623,
-        width:"30%",
-        minWidth: 200,
-        padding: '24px 15px',
+        minWidth: 252,
+        padding: '24px 16px',
         backgroundColor: '#102326',
         border: '0 solid',
         borderRadius: 5,
@@ -29,8 +29,7 @@ const AdInfo = makeStyles({
     filter:{
         margin: '5px 0px 5px 0px',
         display: 'inline-block',
-        width:'100%',
-        minWidth:83,
+        minWidth:170,
     },
     filts:{
         float:'left'
@@ -40,13 +39,13 @@ const AdInfo = makeStyles({
         fontWeight: 300,
     },
     ads: {
+        minWidth: 220,
         marginTop: 12,
-        height:505,
+        height:450,
         overflowY: 'auto',
-        width:'100%',
-        minWidth:83,
     },
     textField: {
+        width: 220,
         '&:before': {
             borderColor: '#26A18D',
         },
@@ -54,8 +53,43 @@ const AdInfo = makeStyles({
             borderColor: '#26A18D',
         },
     },
-    
+    parsers_button:{
+        textTransform: 'none',
+        border: '1px solid',
+        borderRadius: 5,
+        borderColor: '#26A18D',
+        paddingLeft: 66,
+        paddingRight: 66,
+        width: 220,
+        marginTop: 8,
+        '&:hover': {
+          backgroundColor: '#239481',
+        },
+    },
+    parsers_menu:{
+        backgroundColor: '#102326',
+    },
+    parsers_menu_items:{
+        backgroundColor: '#102326',
+        color: '#dfdfdf',
+        width: 220,
+        '&:hover': {
+            backgroundColor: '#102326',
+          },
+    },
+
 });
+
+const GreenCheckbox = withStyles({
+    root: {
+    float: 'right',
+    color: '#26A18D',
+    '&$checked': {
+        color: '#26A18D',
+    },
+    },
+    checked: {},
+  })((props) => <Checkbox color="default" {...props} />);
 
 const theme = createTheme({
     typography: {
@@ -76,40 +110,26 @@ const theme = createTheme({
       divider: '#26A18D',
     },
   });
-/**
- *  FROM RETURN
- * <div className={classes.filts} style={{marginLeft:215}} >
-                
-                    <FormControlLabel
-                    InputProps={{'classes': classes.chek}}
-                    value="start"
-                    control={<Checkbox color="primary" />}
-                    label="Только новые"
-                    labelPlacement="start"
-                    />
-                
-            </div>
-            <div className={classes.filts}>
-                <Select
-                style={{marginLeft: 40}}
-                value='По умолчанию'
-                >
-                    <MenuItem value={'По умолчанию'}>По умолчанию</MenuItem>
-                    <MenuItem value={'Сначала дорогие'}>Сначала дорогие</MenuItem>
-                    <MenuItem value={'Сначала дешёвые'}>Сначала дешёвые</MenuItem>
-                </Select>
 
-            </div>
- */
 function Componet(props) {
     
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
     const classes = AdInfo(props);
     const [search, setSearch] = useState('');
 
     useEffect(() => {
         props.getParsers();
         props.getAds();
-        setInterval(() => { props.getAds()}, 1500);
+        setInterval(() => { props.getAds(); props.getParsers();}, 1500);
     },[])
 
     const filteredData = props.data.filter( elem => {
@@ -123,12 +143,7 @@ function Componet(props) {
         url={ad[3]} />);
     // TODO: ПОРЕШАТЬ ДАТУ НА ОБЪЕКТЫ ЧТОБЫ БЫЛИ ОБЪЯВЛЕНИЯ 
     return <Grid  item  md={2} lg={2} sm={2} xs={2} className={classes.main}>
-        {document.documentElement.clientWidth >= 880 &&
-            <div className={classes.header}>Объявления</div>
-        }
-        {document.documentElement.clientWidth < 880 &&
-            <div className={classes.header}>Объяв.</div>
-        }
+        <div className={classes.header}>Объявления</div>
         <div className={classes.filter}>
             <ThemeProvider theme={theme}>
             <div className={classes.filts}>
@@ -144,6 +159,37 @@ function Componet(props) {
             
             </ThemeProvider>
         </div>
+
+        <Button aria-controls="simple-menu" aria-haspopup="true" className={classes.parsers_button} onClick={handleClick}>
+        Парсеры
+        </Button>
+        <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            MenuListProps={{className:classes.parsers_menu}}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+        >
+        <ThemeProvider theme={theme}>
+        {props.parsers.length == 2 &&
+        <div>
+             {props.parsers[0].map((parser) => 
+             <MenuItem onClick={handleClick} className={classes.parsers_menu_items}>
+                 <div>{parser}</div>
+                 <div><GreenCheckbox /></div>
+            </MenuItem>)}
+        </div>
+        }
+        {props.parsers.length != 2 &&
+        <div>
+            Нет парсеров
+        </div>
+        }
+        </ThemeProvider>       
+        </Menu>
+
+        
         
         <div className={classes.ads}>
             {ads}
