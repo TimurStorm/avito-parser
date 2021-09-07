@@ -24,17 +24,16 @@ def main():
     set_auth()  # подключение auth-методов
     set_parsers()  # подгрузка информации о парсерах
     set_get()  # подключение get-методов
-    eel.init('client')
+    eel.init('src')
 
     # функция включения парсеров
     @eel.expose
     def start_all_parsers():
-        print(eel._js_functions)
         for parser in settings.ALL_PARSERS:
             if parser not in settings.WORKING_PARSERS:
                 settings.WORKING_PARSERS.append(parser)
                 eel.spawn(parser_work, parser)
-        eel.heello()
+        eel.set_js_parser()
 
     eel.start({
         'port': 3000

@@ -7,21 +7,16 @@ import "../css/App.css";
 import Grid from '@material-ui/core/Grid';
 import {connect} from 'react-redux';
 import {async_eel_get_all_parsers, async_eel_get_parser_ads} from './Async/asyncActions';
-
-const eel = window["eel"];
+import {eel} from './heel';
 
 eel.set_host("http://localhost:8000");
-function example(){
-  console.log('mda'*10)
-}
-window.eel.expose(example, "heello");
 
 class App extends Component {
   constructor(props) {
     super(props);    
     console.log(window);
-    props.getAds();
-    props.getParsers();
+    eel.expose(props.getAds, 'set_js_ads');
+    eel.expose(props.getParsers, 'set_js_parser');
   }
   async componentDidMount(){
     await eel.start_all_parsers()();

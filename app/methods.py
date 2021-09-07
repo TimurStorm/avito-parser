@@ -102,5 +102,6 @@ def parser_work(parser):
         parser.ads.append(ad)
     # запускаем основной цикл поиска ( с оповещениями)
     while parser.status == 'active':
+        eel.set_js_ads()
         get_page(parser)
         eel.sleep(parser.time * 60)
