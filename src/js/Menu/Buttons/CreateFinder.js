@@ -8,7 +8,8 @@ import closeOutline  from '@iconify-icons/eva/close-outline';
 import TextField from '@material-ui/core/TextField';
 import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
-import {eel} from '../../eel';
+
+const eel = window["eel"];
 
 const CreateParser = makeStyles((theme) => ({
   backdrop: {
@@ -16,8 +17,8 @@ const CreateParser = makeStyles((theme) => ({
     color: '#fff',
   },
   main: {
-    height: 300,
-    width: 400,
+    height: 400,
+    width: 300,
     backgroundColor: '#102326',
     padding: 24,
     border: '0 solid',
@@ -58,7 +59,7 @@ const CreateParser = makeStyles((theme) => ({
     cursor: 'pointer',
   },
   create: {
-    
+    marginTop: 100,
     marginRight: 0,
     textTransform: 'none',
     backgroundColor: '#26A18D',
@@ -74,7 +75,7 @@ export default function StyledComponents() {
   const classes = CreateParser();
   const [open, setOpen] = React.useState(false);
   const [title, setTitle] = React.useState('');
-  const [url, setUrl] = React.useState('');
+  const [location, setLocation] = React.useState('Москва');
   const [timer, setTimer] = React.useState('');
 
   
@@ -88,7 +89,7 @@ export default function StyledComponents() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let responce = await eel.create_parser(title, url, timer)();
+    let responce = await eel.create_parser(title, location, timer)();
     console.log(responce);
     if (responce){
       handleClose();
@@ -144,20 +145,20 @@ export default function StyledComponents() {
   //
   return (
     <div>
-      <MenuButton title={'Создать парсер'} click={handleToggle} icon={plusCircleOutline}>
+      <MenuButton title={'Создать поиск'} click={handleToggle} icon={plusCircleOutline}>
 
       </MenuButton>
       <Backdrop className={classes.backdrop} open={open}>
         <ThemeProvider theme={theme}>
           <div className={classes.main}>
 
-            <div className={classes.title}>Новый парсер</div>
+            <div className={classes.title}>Новый поиск</div>
             <div className={classes.close} onClick={handleClose}><Icon icon={closeOutline} height={20} width={20} color={'red'}/> </div>
             <div className={classes.items}>
               <form noValidate autoComplete='off' onSubmit={handleSubmit}>
               <div className={classes.item}>
                 <TextField 
-                  label='Название'
+                  label='Что ищем?'
                   onChange={(e) => setTitle(e.target.value)}
                   InputLabelProps={{
                     shrink: true,
@@ -169,8 +170,9 @@ export default function StyledComponents() {
               </div>
               <div className={classes.item}>
                 <TextField 
-                  label='Ссылка'
-                  onChange={(e) => setUrl(e.target.value)}
+                  label='Населённый пункт'
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder='Москва'
                   InputLabelProps={{
                     shrink: true,
                   }}

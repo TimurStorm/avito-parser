@@ -2,7 +2,7 @@ import eel
 import requests
 from datetime import datetime
 from time import time as tm
-from models import AvitoParser
+from models import AvitoParser, Ad
 from settings import *
 
 """
@@ -28,6 +28,7 @@ def get_page(parser: AvitoParser, mode=True):
         resp = requests.get('https://m.avito.ru/api/9/items', params=params).json()
         items = resp['result']['items']
         ads_new = []
+        pks = [ad.pk for ad in parser.ads]
         for item in items:
             value = item['value']
             if item['type'] != 'vip':
@@ -36,10 +37,9 @@ def get_page(parser: AvitoParser, mode=True):
                 pk = value['id']
                 title = value['title']
                 price = value['price']
-                if pk not in parser.ads:
+                if pk not in pks:
                     print('Новое объявление!')
                     ads_new.append((title, pk, price))
-
 
         # записываем изменения в базу данных
         CURSOR.executemany(
@@ -51,9 +51,9 @@ def get_page(parser: AvitoParser, mode=True):
         CURSOR.execute(sql, info)
         CONN.commit()
         # Сохраняем изменения
-        for ad in ads_new:
-            pk = ad[1]
-            parser.ads.append(pk)
+        for info in ads_new:
+            ad = Ad(*info)
+            parser.ads.append(ad)
         print(f"====={parser.title}=====")
         print(f"Status code: {resp['status']}")
         print(f"Time spent: {round(tm() - start_time, 3)} sec")
@@ -61,20 +61,19 @@ def get_page(parser: AvitoParser, mode=True):
         print(e)
 
 
-
 @eel.expose
-def create_parser(title, url, time):
+def create_parser(title, location, time):
     try:
         # создание объекта парсера
         new = AvitoParser(
             title=title,
-            url=url,
             it=time,
+            location=location,
             creation_date=datetime.now().strftime("%d %B %H:%M:%S"),
         )
         # Вставляем данные парсера в таблицу
         CURSOR.execute(
-            f"""INSERT INTO 'parsers' VALUES ('{new.title}', '{new.url}', '{new.time}', '{new.count}','{new.status}',
+            f"""INSERT INTO 'parsers' VALUES ('{new.title}','{new.location}', '{new.time}', '{new.count}','{new.status}',
             '{new.mailing}','{new.creation_date}', '{new.update_date}')"""
         )
         # Сохраняем изменения
@@ -83,22 +82,24 @@ def create_parser(title, url, time):
         CURSOR.execute(
             f"""CREATE TABLE IF NOT EXISTS '{new.title}' ('title', 'pk' , 'price')"""
         )
-        ALL_PARSERS[new.title] = new
+        ALL_PARSERS.append(new)
+
         WORKING_PARSERS.append(new)
         eel.spawn(parser_work, new)
         return True
     except Exception as e:
+        print(e)
         return False
 
 
 # включает парсер и одновляет таблицу бд
 def parser_work(parser):
     # считываем уже имеющиеся объявления
-    CURSOR.execute(f"""SELECT pk from {parser.title}""")
+    CURSOR.execute(f"""SELECT * from "{parser.title}" """)
     ads = CURSOR.fetchall()
     for pk in ads:
-        pk = pk[0]
-        parser.ads.append(pk)
+        ad = Ad(*pk)
+        parser.ads.append(ad)
     # запускаем основной цикл поиска ( с оповещениями)
     while parser.status == 'active':
         get_page(parser)

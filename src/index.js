@@ -19,7 +19,7 @@ const defaultState = {
 const GET_PARSERS = 'GET_PARSERS';
 const GET_ADS = 'GET_ADS';
 const GET_ADINFO ='GET_ADINFO';
-
+const SET_ADINFO_NULL = 'SET_ADINFO_NULL';
 
 const reducer = (state = defaultState, action) => {
     switch (action.type){
@@ -30,12 +30,14 @@ const reducer = (state = defaultState, action) => {
             }
             return {...state};
         case GET_ADS:
-            if (action.payload.length != state.ads.length){
-                state = {...state, ads: action.payload};
-            }
+            console.log(action.payload)
+            state = {...state, ads: action.payload};
             return {...state};
         case GET_ADINFO:
             state = {...state, adinfo: action.payload};
+            return {...state};
+        case SET_ADINFO_NULL:
+            state = {...state, adinfo: null};
             return {...state};
         default:
             return state;
@@ -45,6 +47,7 @@ const reducer = (state = defaultState, action) => {
 export const getParsersAction = (value) => ({type: GET_PARSERS, payload:value});
 export const getAdsAction = (payload) => ({type: GET_ADS, payload});
 export const getAdInfoAction = (payload) => ({type: GET_ADINFO, payload});
+export const setAdInfoAction = () => ({type: SET_ADINFO_NULL});
 
 const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk)));
 

@@ -2,22 +2,30 @@ import '../css/App.css';
 import Menu from './Menu/Menu';
 import Ads from './Main/Templates/MainBlock';
 import AdInfo from './Main/Templates/AdInfo'; 
-import SupportOne from './Main/Templates/Support-1';
-import SupportTwo from './Main/Templates/Support-2';
 import React, { Component } from "react";
 import "../css/App.css";
-import {eel} from './eel';
 import Grid from '@material-ui/core/Grid';
+import {connect} from 'react-redux';
+import {async_eel_get_all_parsers, async_eel_get_parser_ads} from './Async/asyncActions';
 
+const eel = window["eel"];
 
+eel.set_host("http://localhost:8000");
+function example(){
+  console.log('mda'*10)
+}
+window.eel.expose(example, "heello");
 
 class App extends Component {
   constructor(props) {
-    super(props);
-    eel.set_host("ws://localhost:8888");
+    super(props);    
+    console.log(window);
+    props.getAds();
+    props.getParsers();
   }
   async componentDidMount(){
     await eel.start_all_parsers()();
+    
   }
 
   render() {
@@ -40,4 +48,17 @@ class App extends Component {
   }
 }
 
-export default App;
+let mapDispatchToProps = (dispatch) => {
+  return {
+      getParsers: () => {
+          dispatch(async_eel_get_all_parsers());
+      },
+      getAds: () => {
+          dispatch(async_eel_get_parser_ads());
+      }
+  }
+}
+
+const ComponetConnect = connect(null, mapDispatchToProps)(App);
+
+export default ComponetConnect;

@@ -14,7 +14,7 @@ const Ad = makeStyles({
     main: {
         backgroundColor: '#223639',
         minHeight: 30,
-        width: '100%',
+        width: 206,
         border: '0 solid',
         borderRadius: 5,
         marginBottom: 5,
@@ -23,6 +23,9 @@ const Ad = makeStyles({
         '&:hover': {
             background: '#2d474b',
         },
+        '&:active': {
+            background: '#314d52',
+        }
         
     },
     sign: {

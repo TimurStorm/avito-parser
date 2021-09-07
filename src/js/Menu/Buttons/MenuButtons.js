@@ -11,12 +11,12 @@ const MenuButton = makeStyles({
     
     main: {
         
-        marginBottom: 25,
-        height: 30,
+        marginBottom: 17,
+        height: 44,
         width: '100%',
         minWidth: 200,
         fontFamily: 'Rubik',
-        fontWeight: 'regular',
+        fontWeight: 200,
         padding: 0,
         textTransform: 'none',
         '&:hover': {

@@ -1,6 +1,6 @@
-import {eel} from '../eel';
 import {getParsersAction, getAdsAction, getAdInfoAction} from '../../index'
 
+const eel = window["eel"];
 
 export function async_eel_get_all_parsers() {
     return function (dispatch) {

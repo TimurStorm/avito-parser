@@ -37,7 +37,7 @@ if settings_not_exist(CURSOR):
     CONN.commit()
 
 CURSOR.execute(
-    """CREATE TABLE IF NOT EXISTS parsers (name, url , timer, count, status, mailing, creation_date, update_date)"""
+    """CREATE TABLE IF NOT EXISTS parsers (name, location, timer, count, status, mailing, creation_date, update_date)"""
 )
 
 # подгрузка настроек из базы данных
@@ -48,5 +48,5 @@ WIND_SIZE = tuple([int(i) for i in sett["window_size"].split(", ")])
 
 USERNAME = sett["username"]
 
-ALL_PARSERS = {}
+ALL_PARSERS = []
 WORKING_PARSERS = []

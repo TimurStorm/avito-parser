@@ -4,6 +4,7 @@ import { Icon} from '@iconify/react';
 import {connect} from 'react-redux';
 import { Button , Grid,} from '@material-ui/core';
 import closeOutline  from '@iconify-icons/eva/close-outline';
+import {setAdInfoAction} from '../../../index';
 
 var lexample = true;
 
@@ -14,7 +15,7 @@ const Ads = makeStyles({
     },   
     main: {
         backgroundColor: '#102326',
-        minWidth: 353,
+        minWidth: 728,
         height: 623,
         border: '0 solid',
         borderRadius: 5,
@@ -30,6 +31,7 @@ const Ads = makeStyles({
         fontSize: 20,
         fontWeight: 400,
         marginBottom: 10,
+        width: '100%'
     },
     desc:{
         marginTop: 8,
@@ -93,7 +95,10 @@ const Ads = makeStyles({
     },
     scroll_cont:{
         height: 497,
-        overflowY: 'auto',
+        overflow: 'hidden',
+        '&:hover': {
+            overflowY: 'scroll',
+        },
     },
     data_header:{
         fontSize:15,
@@ -102,16 +107,21 @@ const Ads = makeStyles({
     },
     img_cont:{
         display: 'inline-block',
+        overflow: 'hidden',
+        '&:hover': {
+            overflowY: 'scroll',
+        },
     },
     img_item:{
         marginBottom:16,
+        marginRight:8,
     },
     img_image:{
         '&:hover': {
-            filter: 'brightness(60%)',
+            filter: 'brightness(70%)',
         },
         '&:active': {
-            filter: 'brightness(50%)',
+            filter: 'brightness(60%)',
         },
     },
     img_big:{
@@ -121,15 +131,41 @@ const Ads = makeStyles({
         backgroundColor: '#0d1c1f',
         textAlign: 'center',
         marginTop: 16
-    }
+    },
+    stat_cont:{
+        backgroundColor: '#223639',
+        border: '0 solid',
+        borderRadius: 5,
+        padding: '18px 12px',
+        minHeight: 300,
+        marginRight: 16,
+    },
+    stat_header:{
+        fontSize:18
+    },
+    stat_item:{
+        fontWeight:200,
+        fontSize:14,
+        marginTop:8,
+    },
+    stat_graph:{
+        border: '0 solid',
+        marginTop:8,
+        borderRadius: 5,
+        backgroundColor: '#102326',
+        width: '100%' - 16,
+        height:200,
+        padding: 8,
+    },
+    close:{
+        cursor: 'pointer',
+      },
     });
     
     function Componet(props){
     const classes = Ads(props);
     const [bigImg, setImg] = useState(0);
     const [new_title, setTitle] = useState(0);
-
-
 
     let img;
     let desc;
@@ -140,7 +176,34 @@ const Ads = makeStyles({
     let params;
     let url;
 
-    console.log(props.adinfo);
+    let parser_stat;
+
+    var row_count;
+
+    
+    if (typeof props.parsers != undefined && props.parsers.length > 0){
+        row_count = 12;
+
+        if (props.parsers.length == 2){
+            row_count = 6;
+        }
+        else if (props.parsers.length == 3){
+            row_count = 4;
+        }
+        if (props.parsers.length > 0){
+            parser_stat = props.parsers.map((parser) => 
+                <Grid item className={classes.stat_cont} sm={row_count}>
+                    <div className={classes.stat_header}> {parser['title']}</div>
+                    <div className={classes.stat_item}>Всего объявлений: {parser['count']}</div>
+                    <div className={classes.stat_item}>Максимальна цена: </div>
+                    <div className={classes.stat_item}>Минимальная цена: </div>
+                    <div className={classes.stat_graph}>
+                        <div style={{textAlign:'center',marginTop:85, color:'#1b6259'}}>БЕТА: в дальнейшем здесь будет график</div>
+                    </div>
+                </Grid>)
+        }
+    }
+    
     if (props.adinfo){
         title = props.adinfo['title'];
         if (new_title != title){
@@ -172,7 +235,14 @@ const Ads = makeStyles({
                 }
                 {!props.adinfo.hasOwnProperty('error') &&
                     <div>
-                        <div className={classes.header}>{title}</div>
+                        <Grid container direction="row" wrap='nowrap'>
+                            <Grid item sx={11} className={classes.header}>
+                                {title}
+                            </Grid>
+                            <Grid item sx={1} className={classes.close} onClick={() => {props.setAdInfoNull()}}>
+                                <Icon icon={closeOutline} height={20} width={20} color={'red'}/>
+                            </Grid>
+                        </Grid>
                         <div className={classes.scroll_cont}>
                             <div className={classes.img_big}>
                                 <p style={{margin:0}}><img src={bigImg['1280x960']} style={{maxWidth:480}} height='360'/></p>
@@ -204,16 +274,19 @@ const Ads = makeStyles({
                                 </Grid>
                             </div>
                         </div>
-                        <Button className={classes.btn} onClick={() =>{window.open(url, '_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');}}>Подробнее</Button>
+                        <Button className={classes.btn} onClick={() =>{window.open(url, '_blank', 'location=yes,height=600,width=1000,scrollbars=yes,status=yes');}}>Подробнее</Button>
                     </div>
                 }
             </div>
         }
         
         {!props.adinfo &&
-            <div>
-                <div className={classes.desc}>gggggggggggggggggggggggggs</div>
-            </div>
+        <div>
+            <div className={classes.header}>Парсеры</div>
+            <Grid container direction="row" wrap='nowrap' >
+                {parser_stat}
+            </Grid>
+        </div>
         }
     </Grid>;
     }
@@ -222,11 +295,20 @@ const Ads = makeStyles({
     let mapStateToProps = (state) => {
     return {
         adinfo: state.adinfo,
+        parsers: state.parsers,
     }
+    }
+
+    let mapDispatchToProps = (dispatch) => {
+        return {
+            setAdInfoNull: () => {
+                dispatch(setAdInfoAction());
+            },
+        }
     }
     
     
-    const ComponetConnect = connect(mapStateToProps)(Componet);
+    const ComponetConnect = connect(mapStateToProps, mapDispatchToProps)(Componet);
 
 export default ComponetConnect;
 

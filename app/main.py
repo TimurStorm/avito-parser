@@ -17,7 +17,7 @@ def set_parsers():
         parser = list(parser)
         if parser[4] == "active":
             new = AvitoParser(*parser)
-            settings.ALL_PARSERS[parser[0]] = new
+            settings.ALL_PARSERS.append(new)
 
 
 def main():
@@ -29,18 +29,19 @@ def main():
     # функция включения парсеров
     @eel.expose
     def start_all_parsers():
-        for parser in settings.ALL_PARSERS.values():
+        print(eel._js_functions)
+        for parser in settings.ALL_PARSERS:
             if parser not in settings.WORKING_PARSERS:
                 settings.WORKING_PARSERS.append(parser)
                 eel.spawn(parser_work, parser)
+        eel.heello()
 
     eel.start({
         'port': 3000
     }, options={
         'block': False,
+        'time_shutdown': 600000,
         'size': settings.WIND_SIZE,
-        'port': 8888,
-        'host': 'localhost',
     }, suppress_error=True)
     while True:
         eel.sleep(1)

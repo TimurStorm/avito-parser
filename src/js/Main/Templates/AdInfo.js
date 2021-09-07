@@ -3,10 +3,9 @@ import { makeStyles , createTheme, withStyles} from '@material-ui/core/styles';
 import '../../../css/Scroll.css';
 import {Button, Menu, MenuItem} from '@material-ui/core';
 import Ad from './Ad';
-import React, {useEffect, useState} from 'react';
-import searchOutline from '@iconify-icons/eva/search-outline';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {async_eel_get_all_parsers, async_eel_get_parser_ads} from '../../Async/asyncActions';
+import searchOutline from '@iconify-icons/eva/search-outline';
 
 const AdInfo = makeStyles({
     main: {
@@ -93,7 +92,7 @@ const GreenCheckbox = withStyles({
 
 const theme = createTheme({
     typography: {
-      fontFamily: 'Rubik',
+      fontFamily: 'sans-serif',
       fontSize: 14,
       fontWeight: 'light',
     },
@@ -125,12 +124,6 @@ function Componet(props) {
 
     const classes = AdInfo(props);
     const [search, setSearch] = useState('');
-
-    useEffect(() => {
-        props.getParsers();
-        props.getAds();
-        setInterval(() => { props.getAds(); props.getParsers();}, 1500);
-    },[])
 
     const filteredData = props.data.filter( elem => {
         return elem[0].toLowerCase().includes(search.toLowerCase());
@@ -174,9 +167,9 @@ function Componet(props) {
         <ThemeProvider theme={theme}>
         {props.parsers.length == 2 &&
         <div>
-             {props.parsers[0].map((parser) => 
+             {props.parsers.map((parser) => 
              <MenuItem onClick={handleClick} className={classes.parsers_menu_items}>
-                 <div>{parser}</div>
+                 <div>{parser['title']}</div>
                  <div><GreenCheckbox /></div>
             </MenuItem>)}
         </div>
@@ -204,17 +197,8 @@ let mapStateToProps = (state) => {
     }
 }
 
-let mapDispatchToProps = (dispatch) => {
-    return {
-        getParsers: () => {
-            dispatch(async_eel_get_all_parsers());
-        },
-        getAds: () => {
-            dispatch(async_eel_get_parser_ads());
-        }
-    }
-}
 
-const ComponetConnect = connect(mapStateToProps, mapDispatchToProps)(Componet);
+
+const ComponetConnect = connect(mapStateToProps)(Componet);
 
 export default ComponetConnect;

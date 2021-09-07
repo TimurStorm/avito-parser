@@ -13,25 +13,16 @@ def set_get():
     @eel.expose
     def get_parser_ads():
 
-        # TODO: модифицировать до выдачи объектов Ad, избавиться от sql запроса
-
         resp = []
-        parser_names = [parser.title for parser in settings.WORKING_PARSERS]
-        try:
-            for name in parser_names:
-                settings.CURSOR.execute(f"""SELECT * from {name}""")
-                info = settings.CURSOR.fetchall()
-                info = [[i[0], i[2], name, i[1]] for i in info]
-                resp += info
-        except TypeError:
-            pass
+        for parser in settings.WORKING_PARSERS:
+            ads = parser.ads
+            info = [[ad.title, ad.price, parser.title, ad.pk] for ad in ads]
+            resp += info
         return resp
 
     @eel.expose
     def get_all_parsers():
-        settings.CURSOR.execute(f"""SELECT name, timer from parsers""")
-        info = settings.CURSOR.fetchall()
-        info = [[i[0] for i in info], [i[1] for i in info]]
+        info = [{"title": parser.title, "count": len(parser.ads), } for parser in settings.ALL_PARSERS]
         return info
 
     @eel.expose
