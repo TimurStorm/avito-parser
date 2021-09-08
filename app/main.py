@@ -24,7 +24,7 @@ def main():
     set_auth()  # подключение auth-методов
     set_parsers()  # подгрузка информации о парсерах
     set_get()  # подключение get-методов
-    eel.init('src')
+    eel.init("src")
 
     # функция включения парсеров
     @eel.expose
@@ -34,14 +34,17 @@ def main():
                 settings.WORKING_PARSERS.append(parser)
                 eel.spawn(parser_work, parser)
         eel.set_js_parser()
+        eel.set_js_ads()
 
-    eel.start({
-        'port': 3000
-    }, options={
-        'block': False,
-        'time_shutdown': 600000,
-        'size': settings.WIND_SIZE,
-    }, suppress_error=True)
+    eel.start(
+        {"port": 3000},
+        options={
+            "block": False,
+            "time_shutdown": 600000,
+            "size": settings.WIND_SIZE,
+        },
+        suppress_error=True,
+    )
     while True:
         eel.sleep(1)
 

@@ -35,9 +35,7 @@ class App extends Component {
            <Menu/>
            <Ads/>
            <AdInfo/>
-          </Grid>
-        
-        
+          </Grid>        
       </div>
     );
   }

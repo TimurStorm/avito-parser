@@ -282,7 +282,7 @@ const Ads = makeStyles({
         
         {!props.adinfo &&
         <div>
-            <div className={classes.header}>Парсеры</div>
+            <div className={classes.header}>Поиски</div>
             <Grid container direction="row" wrap='nowrap' >
                 {parser_stat}
             </Grid>

@@ -1,11 +1,12 @@
-import { Grid, ThemeProvider, TextField, Checkbox} from '@material-ui/core';
+import { Grid, ThemeProvider, TextField, Checkbox, Typography, Accordion, AccordionSummary, AccordionDetails} from '@material-ui/core';
 import { makeStyles , createTheme, withStyles} from '@material-ui/core/styles';
 import '../../../css/Scroll.css';
-import {Button, Menu, MenuItem} from '@material-ui/core';
 import Ad from './Ad';
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import searchOutline from '@iconify-icons/eva/search-outline';
+
+var ads_height = 450;
 
 const AdInfo = makeStyles({
     main: {
@@ -40,7 +41,7 @@ const AdInfo = makeStyles({
     ads: {
         minWidth: 220,
         marginTop: 12,
-        height:450,
+        height: ads_height,
         overflowY: 'auto',
     },
     textField: {
@@ -52,31 +53,22 @@ const AdInfo = makeStyles({
             borderColor: '#26A18D',
         },
     },
-    parsers_button:{
-        textTransform: 'none',
-        border: '1px solid',
-        borderRadius: 5,
-        borderColor: '#26A18D',
-        paddingLeft: 66,
-        paddingRight: 66,
-        width: 220,
-        marginTop: 8,
-        '&:hover': {
-          backgroundColor: '#239481',
-        },
-    },
-    parsers_menu:{
-        backgroundColor: '#102326',
-    },
-    parsers_menu_items:{
-        backgroundColor: '#102326',
+    accord_cont:{
+        background: '#0d1c1f',
+        border: '1 solid',
         color: '#dfdfdf',
-        width: 220,
-        '&:hover': {
-            backgroundColor: '#102326',
-          },
     },
-
+    accord_item_text:{
+        float:'left',
+        marginTop:12,
+    },
+    accord_item_check:{
+        float:'left',
+    },
+    accord_button:{
+        background: '#26A18D',
+        color: '#dfdfdf',
+    }
 });
 
 const GreenCheckbox = withStyles({
@@ -111,80 +103,116 @@ const theme = createTheme({
   });
 
 function Componet(props) {
-    
-    const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
-
+    var check = [];
+    if (props.parsers.length > 0)
+    console.log(props.parsers.length);
+    for (let i=0;i< props.parsers.length; i++){
+        check.push(true)
+    }
+    console.log(check);
     const classes = AdInfo(props);
+    
+    const [accordOpen, setAccordOpen] = useState(false);
     const [search, setSearch] = useState('');
+    const [checkParsers, setCheckParsers] = useState(check);
+    const handleClick = (event) => {
+        setAccordOpen(event.currentTarget);
+    };
+    console.log(checkParsers)
+    const handleAccardi = () => {
+        if (accordOpen == false){
+            while (ads_height > 220){
+                ads_height -= 1;
+            }
+            setAccordOpen(true);
+        } 
+        else{
+            setTimeout(() => {
+                while (ads_height < 450){
+                    ads_height += 0.5;
+                }
+                setAccordOpen(false);
+            }, 200);
+            
+        }
+    }
+
 
     const filteredData = props.data.filter( elem => {
         return elem[0].toLowerCase().includes(search.toLowerCase());
     });
+
+    const setCheck = (id) => {
+        let x = checkParsers;
+        console.log(checkParsers);
+        if (x[id] == true){
+            x[id] = false;
+        }
+        else{
+            x[id] = true;
+        }
+        setCheckParsers(x);
+        
+    }
 
     const ads = filteredData.map((ad)=> <Ad 
         title={ad[0]} 
         price={ad[1]}
         parser={ad[2]}
         url={ad[3]} />);
-    // TODO: ПОРЕШАТЬ ДАТУ НА ОБЪЕКТЫ ЧТОБЫ БЫЛИ ОБЪЯВЛЕНИЯ 
     return <Grid  item  md={2} lg={2} sm={2} xs={2} className={classes.main}>
         <div className={classes.header}>Объявления</div>
         <div className={classes.filter}>
             <ThemeProvider theme={theme}>
-            <div className={classes.filts}>
-                <TextField
-                    icon={searchOutline}
-                    placeholder='Поиск'
-                    InputProps={{
-                        className: classes.textField
-                    }}
-                    onChange={(event) => setSearch(event.target.value)}
+                <div className={classes.filts}>
+                    <TextField
+                        icon={searchOutline}
+                        placeholder='Поиск'
+                        InputProps={{
+                            className: classes.textField
+                        }}
+                        onChange={(event) => setSearch(event.target.value)}
                     />
                 </div>
-            
             </ThemeProvider>
         </div>
-
-        <Button aria-controls="simple-menu" aria-haspopup="true" className={classes.parsers_button} onClick={handleClick}>
-        Парсеры
-        </Button>
-        <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            MenuListProps={{className:classes.parsers_menu}}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-        >
-        <ThemeProvider theme={theme}>
-        {props.parsers.length == 2 &&
-        <div>
-             {props.parsers.map((parser) => 
-             <MenuItem onClick={handleClick} className={classes.parsers_menu_items}>
-                 <div>{parser['title']}</div>
-                 <div><GreenCheckbox /></div>
-            </MenuItem>)}
-        </div>
-        }
-        {props.parsers.length != 2 &&
-        <div>
-            Нет парсеров
-        </div>
-        }
-        </ThemeProvider>       
-        </Menu>
+        <Accordion TransitionProps={{className: classes.accord_cont}} >
+            <AccordionSummary onClick={() => {handleAccardi()}} className={classes.accord_button}>
+                <Typography>Поиски</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+                <ThemeProvider theme={theme}>
+                    {props.parsers.length > 0 &&
+                    <div style={{width: 220}}>
+                        {props.parsers.map((parser) => 
+                        <div onClick={handleClick} style={{height: 44}} onClick={() => {setCheck(props.parsers.indexOf(parser))}}>
+                            <div className={classes.accord_item_text}>
+                                {parser['title'].length >= 15 && 
+                                    <a>{parser['title'].slice(0,14) + '...'}</a>
+                                }
+                                {parser['title'].length < 15 && 
+                                    <a>{parser['title']}</a>
+                                }
+                            </div>
+                            <GreenCheckbox classNames={classes.accord_item_check}/>
+                        </div>)}
+                    </div>
+                    }
+                    {props.parsers.length == 0 &&
+                    <div>
+                        Нет парсеров
+                    </div>
+                    }
+                </ThemeProvider>  
+            </AccordionDetails>
+        </Accordion>
+             
+        
 
         
         
-        <div className={classes.ads}>
+        <div className={classes.ads} style={{height: ads_height}}>
             {ads}
         </div>
     </Grid>  

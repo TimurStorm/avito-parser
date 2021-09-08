@@ -41,7 +41,7 @@ const CreateParser = makeStyles((theme) => ({
     width: 190
   },
   items: {
-    paddingTop: 30,
+    paddingTop: 50,
   },
   item: {
     marginTop: 19,
@@ -59,7 +59,7 @@ const CreateParser = makeStyles((theme) => ({
     cursor: 'pointer',
   },
   create: {
-    marginTop: 100,
+    marginTop: 80,
     marginRight: 0,
     textTransform: 'none',
     backgroundColor: '#26A18D',
@@ -154,34 +154,35 @@ export default function StyledComponents() {
 
             <div className={classes.title}>Новый поиск</div>
             <div className={classes.close} onClick={handleClose}><Icon icon={closeOutline} height={20} width={20} color={'red'}/> </div>
-            <div className={classes.items}>
+            
               <form noValidate autoComplete='off' onSubmit={handleSubmit}>
-              <div className={classes.item}>
-                <TextField 
-                  label='Что ищем?'
-                  onChange={(e) => setTitle(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  InputProps={{
-                    className: classes.textField
-                  }}
-                  />
-              </div>
-              <div className={classes.item}>
-                <TextField 
-                  label='Населённый пункт'
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder='Москва'
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  InputProps={{
-                    className: classes.textField
-                  }}
-                  />
-              </div>
-              <div className={classes.item}>
+                <div className={classes.items}>
+                  <div className={classes.item}>
+                    <TextField 
+                      label='Что ищем?'
+                      onChange={(e) => setTitle(e.target.value)}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      InputProps={{
+                        className: classes.textField
+                      }}
+                      />
+                  </div>
+                <div className={classes.item} >
+                  <TextField 
+                    label='Населённый пункт'
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder='Москва'
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      className: classes.textField
+                    }}
+                    />
+                </div>
+                <div className={classes.item}>
                   <div className={classes.label}>
                     Таймер
                   </div>
@@ -195,6 +196,7 @@ export default function StyledComponents() {
                   valueLabelDisplay="auto"
                   marks={marks}
                   />
+                </div>
               </div>
               <Button 
               className={classes.create} 
@@ -203,7 +205,6 @@ export default function StyledComponents() {
                 Cоздать
               </Button>
               </form>
-            </div>
           </div>
         </ThemeProvider>
       </Backdrop>

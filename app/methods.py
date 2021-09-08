@@ -16,35 +16,33 @@ def get_page(parser: AvitoParser, mode=True):
     try:
 
         params = {
-            'query': parser.title.replace(' ', '+'),
-            'limit': 50,
-            'display': 'list',
-            'locationId': 650400,
-            'searchRadius': 100,
-            'lastStamp': 1610905380,
-            'key': 'af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir',
+            "query": parser.title.replace(" ", "+"),
+            "limit": 50,
+            "display": "list",
+            "locationId": 650400,
+            "searchRadius": 100,
+            "lastStamp": 1610905380,
+            "key": "af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir",
         }
 
-        resp = requests.get('https://m.avito.ru/api/9/items', params=params).json()
-        items = resp['result']['items']
+        resp = requests.get("https://m.avito.ru/api/9/items", params=params).json()
+        items = resp["result"]["items"]
         ads_new = []
         pks = [ad.pk for ad in parser.ads]
         for item in items:
-            value = item['value']
-            if item['type'] != 'vip':
-                if 'list' in value.keys():
-                    value = value['list']
-                pk = value['id']
-                title = value['title']
-                price = value['price']
+            value = item["value"]
+            if item["type"] != "vip":
+                if "list" in value.keys():
+                    value = value["list"]
+                pk = value["id"]
+                title = value["title"]
+                price = value["price"]
                 if pk not in pks:
-                    print('Новое объявление!')
+                    print("Новое объявление!")
                     ads_new.append((title, pk, price))
 
         # записываем изменения в базу данных
-        CURSOR.executemany(
-            f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new
-        )
+        CURSOR.executemany(f"INSERT INTO '{parser.title}' VALUES (?,?,?)", ads_new)
         CONN.commit()
         info = (datetime.now().strftime("%d %B %H:%M:%S"), parser.title)
         sql = f"""UPDATE parsers SET update_date = ? WHERE name = ?"""
@@ -101,7 +99,8 @@ def parser_work(parser):
         ad = Ad(*pk)
         parser.ads.append(ad)
     # запускаем основной цикл поиска ( с оповещениями)
-    while parser.status == 'active':
-        eel.set_js_ads()
+    while parser.status == "active":
         get_page(parser)
+        eel.set_js_ads()
+        eel.set_js_parsers()
         eel.sleep(parser.time * 60)

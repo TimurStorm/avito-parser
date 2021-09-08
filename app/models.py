@@ -1,4 +1,3 @@
-
 """
 Файл для объявления моделей
 """
@@ -42,5 +41,3 @@ class User:
         self.username = username
         self.email = email
         self.vk_id = vk_id
-
-

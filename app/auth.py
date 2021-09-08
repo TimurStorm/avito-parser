@@ -21,7 +21,9 @@ def set_auth():
             set_password(
                 service_name="Parser", username=USERNAME + "_pwd", password=password
             )
-            set_password(service_name="Parser", username=USERNAME + "_ema", password=email)
+            set_password(
+                service_name="Parser", username=USERNAME + "_ema", password=email
+            )
         return info
 
     @eel.expose
@@ -31,8 +33,9 @@ def set_auth():
         print(info["text"])
         if resp.status_code == 200:
             if (
-                    get_password(service_name="Parser", username=USERNAME + "_pwd") is None
-                    or get_password(service_name="Parser", username=USERNAME + "_ema") is None
+                get_password(service_name="Parser", username=USERNAME + "_pwd") is None
+                or get_password(service_name="Parser", username=USERNAME + "_ema")
+                is None
             ):
                 set_password(
                     service_name="Parser", username=USERNAME + "_pwd", password=password
@@ -44,6 +47,7 @@ def set_auth():
 
     def auto_login():
         from settings import USERNAME
+
         name = USERNAME
         pwd = get_password(service_name="Parser", username=f"{name}_pwd")
         ema = get_password(service_name="Parser", username=f"{name}_ema")
